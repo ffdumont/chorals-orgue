@@ -86,7 +86,7 @@
           osmd.render();
           osmd.cursor.show();
           osmd.cursor.reset();
-          fitScoreHeight(block, osmdDiv);
+          fitHeights(block, osmdDiv);
           // Ensure the start of the score is visible initially (before
           // the video starts, followCursor has nothing to scroll to yet).
           var scoreWrap = block.querySelector(".score-wrap");
@@ -131,18 +131,21 @@
     });
   }
 
-  // Shrink the score wrapper to fit the actually-rendered SVG content so
-  // short examples (4 onsets on 2 staves) do not show a tall empty grey
-  // panel. Capped at ~65% of viewport height for long pieces like BWV 572.
-  function fitScoreHeight(block, osmdDiv) {
-    var wrap = block.querySelector(".score-wrap");
-    if (!wrap) return;
+  // Fit the score-wrap to the actually-rendered single-system SVG height,
+  // and align the video-wrap to the same height. The video's 16:9 aspect
+  // ratio then drives its width. Minimum height keeps the video watchable
+  // even for very short / thin scores.
+  function fitHeights(block, osmdDiv) {
+    var scoreWrap = block.querySelector(".score-wrap");
+    var videoWrap = block.querySelector(".video-wrap");
+    if (!scoreWrap) return;
     var svg = osmdDiv.querySelector("svg");
     var contentH = svg ? svg.getBoundingClientRect().height : osmdDiv.scrollHeight;
-    var minH = 160;
-    var maxH = Math.min(window.innerHeight * 0.65, 640);
+    var minH = 260;
+    var maxH = Math.min(window.innerHeight * 0.6, 520);
     var target = Math.max(minH, Math.min(contentH + 16, maxH));
-    wrap.style.height = target + "px";
+    scoreWrap.style.height = target + "px";
+    if (videoWrap) videoWrap.style.height = target + "px";
   }
 
   function resetCursorTo(state, t) {
