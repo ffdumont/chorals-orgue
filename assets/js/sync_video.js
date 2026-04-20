@@ -67,12 +67,12 @@
           pageFormat: "Endless",
           drawingParameters: "compact",
           renderSingleHorizontalStaffline: true,
-          // Bright, thick cursor so it remains visible on dense scores.
-          // type: 3 = TimeLine (thicker bar than the default thin line)
+          // Make OSMD's internal cursor invisible (alpha=0). We draw our
+          // own visible overlay on top, positioned by syncCustomCursor().
           cursorsOptions: [{
-            color: "#e60026",
-            alpha: 0.55,
-            type: 3,
+            color: "#000000",
+            alpha: 0.0,
+            type: 0,
             follow: true,
           }],
         });
@@ -88,16 +88,27 @@
           osmd.cursor.show();
           osmd.cursor.reset();
           fitHeights(block, osmdDiv);
-          // Ensure the start of the score is visible initially (before
-          // the video starts, followCursor has nothing to scroll to yet).
+
+          // Inject our custom visible cursor overlay inside .osmd-host.
+          var customCursor = document.createElement("div");
+          customCursor.className = "custom-cursor";
+          osmdDiv.appendChild(customCursor);
+          state.customCursor = customCursor;
+          state.osmdDiv = osmdDiv;
+
+          // Ensure the start of the score is visible initially.
           var scoreWrap = block.querySelector(".score-wrap");
           if (scoreWrap) scoreWrap.scrollLeft = 0;
+
+          // Initial cursor position
+          syncCustomCursor(state);
           statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
-              if (cursorCheckbox.checked) osmd.cursor.show();
-              else osmd.cursor.hide();
+              if (state.customCursor) {
+                state.customCursor.style.display = cursorCheckbox.checked ? "block" : "none";
+              }
             });
           }
 
@@ -158,6 +169,25 @@
     }
   }
 
+  // Copy OSMD's internal cursor position onto our own visible overlay.
+  // OSMD renders its cursor as an <img> element absolutely positioned
+  // inside the container; we read its style.left/top/height and mirror
+  // them onto our .custom-cursor div.
+  function syncCustomCursor(state) {
+    if (!state.osmdDiv || !state.customCursor) return;
+    var imgs = state.osmdDiv.querySelectorAll("img");
+    if (!imgs.length) return;
+    // OSMD's cursor <img> is appended after the SVG; grab the last img.
+    var src = imgs[imgs.length - 1];
+    var left = parseFloat(src.style.left);
+    var top = parseFloat(src.style.top);
+    var height = parseFloat(src.style.height) || src.height;
+    if (isFinite(left)) state.customCursor.style.left = left + "px";
+    if (isFinite(top)) state.customCursor.style.top = top + "px";
+    if (isFinite(height) && height > 0) state.customCursor.style.height = height + "px";
+    state.customCursor.style.display = "block";
+  }
+
   function syncLoop(state) {
     if (!state.ytPlayer || typeof state.ytPlayer.getCurrentTime !== "function") {
       requestAnimationFrame(function () { syncLoop(state); });
@@ -166,23 +196,27 @@
     var offset = parseFloat(state.offsetInput.value) || 0;
     var t = state.ytPlayer.getCurrentTime() - offset;
 
+    var moved = false;
     // Scrub backward -> rewind cursor from scratch
     if (state.cursorStep > 0 && state.timemap[state.cursorStep - 1] > t + 0.25) {
       resetCursorTo(state, t);
+      moved = true;
     } else {
       while (state.cursorStep < state.timemap.length && state.timemap[state.cursorStep] <= t) {
         state.osmd.cursor.next();
         state.cursorStep++;
+        moved = true;
       }
     }
+    if (moved) syncCustomCursor(state);
 
-    // Live debug: show step/total + t so the user can see the cursor is
-    // actually advancing even if visually subtle. Removed by clicking
-    // the "Curseur visible" checkbox off then on (future improvement).
+    // Live debug: step/total + t + cursor X (so we can see if the cursor
+    // is advancing at all).
     if (state.statusEl) {
+      var cx = state.customCursor && state.customCursor.style.left || "?";
       state.statusEl.textContent =
         "step " + state.cursorStep + "/" + state.timemap.length +
-        "  t=" + t.toFixed(2) + "s";
+        "  t=" + t.toFixed(2) + "  x=" + cx;
     }
 
     requestAnimationFrame(function () { syncLoop(state); });

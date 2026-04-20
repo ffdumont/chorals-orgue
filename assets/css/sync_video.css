@@ -47,14 +47,21 @@
 }
 .sync-block .osmd-host { height: 100%; position: relative; }
 
-/* Force-visible cursor: OSMD dessine le curseur comme un element
-   positionne absolument dans son conteneur, avec un fond bleu pale par
-   defaut. On le surcharge pour qu'il soit bien visible sur toutes les
-   partitions, meme denses. */
-.sync-block .osmd-host img[id^="cursorImg"],
-.sync-block .osmd-host [id*="osmdCanvasVexFlowBackend"] + img {
-  opacity: 0.55 !important;
-  filter: hue-rotate(320deg) saturate(5) brightness(1.1) !important;
+/* Curseur custom dessine en par-dessus le curseur OSMD (qu'on rend
+   transparent via alpha=0). Sa position est copiee a chaque frame depuis
+   le curseur OSMD interne (cf. syncCustomCursor dans sync_video.js).
+   Avantage : visible de maniere garantie, quoi que fasse OSMD. */
+.sync-block .custom-cursor {
+  position: absolute;
+  width: 3px;
+  background: rgba(230, 0, 38, 0.65);
+  box-shadow: 0 0 4px rgba(230, 0, 38, 0.5);
+  pointer-events: none;
+  z-index: 10;
+  display: none;
+  top: 0;
+  left: 0;
+  height: 100%;
 }
 
 @media (max-width: 900px) {
