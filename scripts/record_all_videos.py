@@ -17,6 +17,7 @@ import random
 import time
 
 from record_video import VideoRecorder
+from stops_control import Stops
 
 OUT_DIR = r'D:/Projects/chorals-orgue/assets/video'
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -153,6 +154,12 @@ if __name__ == '__main__':
     print('IMPORTANT : GrandOrgue doit etre sur l\'ecran 2, non recouvert.')
     print('Aucun son parasite pendant l\'enregistrement.')
     time.sleep(2)
+
+    # Reset deterministe : A.G. coupe tous les jeux + accouplements,
+    # puis les pedales d'expression sont ouvertes a 127.
+    print('Reset initial (A.G. + enclosures ouvertes)...')
+    stops = Stops(out)
+    stops.reset()
 
     # Warmup : sans cela, le tout premier chord de la premiere capture
     # peut tomber avant que le moteur audio de GrandOrgue soit actif

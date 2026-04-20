@@ -54,6 +54,10 @@ CC_ENCLOSURES = {
     'right': 61,   # pedale droite
 }
 
+# Annulateur General (A.G.) : bouton absolu du Combinateur qui coupe
+# TOUS les jeux + accouplements en un envoi. Canal 16.
+CC_GENERAL_CANCEL = 63
+
 
 class Stops:
     """Gestionnaire de tirants (jeux) pour l'orgue virtuel."""
@@ -82,6 +86,44 @@ class Stops:
         for s in stop_names:
             self.toggle(s)
             time.sleep(0.05)  # petit delai pour GrandOrgue
+
+    def toggle_coupler(self, coupler_name):
+        """Bascule un accouplement (I/P, II/P, II/I)."""
+        if coupler_name not in CC_COUPLERS:
+            raise ValueError(f'Accouplement inconnu : {coupler_name}. '
+                             f'Disponibles : {list(CC_COUPLERS)}')
+        self._out.send(mido.Message('control_change',
+                                     channel=STOPS_CHANNEL,
+                                     control=CC_COUPLERS[coupler_name],
+                                     value=127))
+
+    def set_enclosure(self, name, value):
+        """Positionne une pedale d'expression. value : 0 (ferme) a 127 (ouvert)."""
+        if name not in CC_ENCLOSURES:
+            raise ValueError(f'Enclosure inconnue : {name}. '
+                             f'Disponibles : {list(CC_ENCLOSURES)}')
+        v = max(0, min(127, int(value)))
+        self._out.send(mido.Message('control_change',
+                                     channel=STOPS_CHANNEL,
+                                     control=CC_ENCLOSURES[name], value=v))
+
+    def general_cancel(self):
+        """Annulateur General (A.G.) : coupe tous les jeux + accouplements
+        en un seul envoi. C'est un etat absolu, pas un toggle."""
+        self._out.send(mido.Message('control_change',
+                                     channel=STOPS_CHANNEL,
+                                     control=CC_GENERAL_CANCEL, value=127))
+
+    def reset(self, enclosures_value=127):
+        """Etat initial deterministe avant enregistrement :
+        A.G. (tout coupe) + pedales d'expression ouvertes a `enclosures_value`."""
+        import time
+        self.general_cancel()
+        time.sleep(0.3)
+        for name in CC_ENCLOSURES:
+            self.set_enclosure(name, enclosures_value)
+            time.sleep(0.05)
+        time.sleep(0.2)
 
     def close(self):
         if not self._external_port:
