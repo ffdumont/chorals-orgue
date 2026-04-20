@@ -66,7 +66,14 @@
           followCursor: true,
           pageFormat: "Endless",
           drawingParameters: "compact",
+          renderSingleHorizontalStaffline: true,
         });
+        // Force single-line rendering (no wrap to new systems). Passing the
+        // option to the constructor is not always honored depending on OSMD
+        // build/version, so we also set the EngravingRules flag directly.
+        if (osmd.EngravingRules) {
+          osmd.EngravingRules.RenderSingleHorizontalStaffline = true;
+        }
         state.osmd = osmd;
         return osmd.load(xml).then(function () {
           osmd.render();
