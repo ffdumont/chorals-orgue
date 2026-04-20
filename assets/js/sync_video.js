@@ -68,28 +68,46 @@
           followCursor: true,
           pageFormat: "Endless",
           drawingParameters: "compact",
+          // OSMD cursor is kept invisible (alpha=0); we draw our own
+          // visible overlay (see customCursor below) since the theme's
+          // global `img` CSS was killing OSMD's native cursor rendering.
+          cursorsOptions: [{ color: "#000000", alpha: 0.0, type: 0, follow: true }],
         });
         state.osmd = osmd;
         return osmd.load(xml).then(function () {
           osmd.render();
-          // Match what worked in the standalone proto: show() only, no reset().
           osmd.cursor.show();
           fitHeights(block, osmdDiv);
+
+          // Build our own visible cursor overlay. Fully inline styles so
+          // no CSS rule from the theme can interfere.
+          var customCursor = document.createElement("div");
+          customCursor.style.cssText =
+            "position:absolute;" +
+            "width:4px;" +
+            "background:rgba(230,0,38,0.7);" +
+            "box-shadow:0 0 6px rgba(230,0,38,0.5);" +
+            "pointer-events:none;" +
+            "z-index:1000;" +
+            "top:0;" +
+            "left:0;" +
+            "height:100%;" +
+            "display:block;";
+          osmdDiv.appendChild(customCursor);
+          state.customCursor = customCursor;
+          state.osmdDiv = osmdDiv;
 
           var scoreWrap = block.querySelector(".score-wrap");
           if (scoreWrap) scoreWrap.scrollLeft = 0;
 
-          // Debug snapshot: what did OSMD actually put in the container?
-          var imgCount = osmdDiv.querySelectorAll("img").length;
-          var svgCount = osmdDiv.querySelectorAll("svg").length;
-          statusEl.textContent =
-            "Partition OK (" + state.timemap.length + " onsets, " +
-            svgCount + " svg, " + imgCount + " img).";
+          syncCustomCursor(state);
+          statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
-              if (cursorCheckbox.checked) osmd.cursor.show();
-              else osmd.cursor.hide();
+              if (state.customCursor) {
+                state.customCursor.style.display = cursorCheckbox.checked ? "block" : "none";
+              }
             });
           }
 
@@ -148,6 +166,33 @@
     }
   }
 
+  // Read OSMD cursor's actual rendered position via offsetLeft/offsetTop
+  // (works regardless of whether OSMD uses style.left or HTML attributes)
+  // and apply it to our visible custom cursor div.
+  function syncCustomCursor(state) {
+    if (!state.osmdDiv || !state.customCursor) return;
+    // OSMD exposes .cursor which has an internal cursorElement in most versions
+    var el = null;
+    var c = state.osmd && state.osmd.cursor;
+    if (c) el = c.cursorElement || (c.cursorElements && c.cursorElements[0]);
+    // Fallback: find any absolute-positioned img inside the container
+    if (!el) {
+      var imgs = state.osmdDiv.querySelectorAll("img");
+      for (var i = 0; i < imgs.length; i++) {
+        var img = imgs[i];
+        if (img.style && img.style.position === "absolute") { el = img; break; }
+      }
+      if (!el && imgs.length) el = imgs[imgs.length - 1];
+    }
+    if (!el) return;
+    var left = el.offsetLeft;
+    var top = el.offsetTop;
+    var height = el.offsetHeight;
+    if (isFinite(left)) state.customCursor.style.left = left + "px";
+    if (isFinite(top) && top > 0) state.customCursor.style.top = top + "px";
+    if (isFinite(height) && height > 0) state.customCursor.style.height = height + "px";
+  }
+
   function syncLoop(state) {
     if (!state.ytPlayer || typeof state.ytPlayer.getCurrentTime !== "function") {
       requestAnimationFrame(function () { syncLoop(state); });
@@ -156,31 +201,23 @@
     var offset = parseFloat(state.offsetInput.value) || 0;
     var t = state.ytPlayer.getCurrentTime() - offset;
 
+    var moved = false;
     if (state.cursorStep > 0 && state.timemap[state.cursorStep - 1] > t + 0.25) {
       resetCursorTo(state, t);
+      moved = true;
     } else {
       while (state.cursorStep < state.timemap.length && state.timemap[state.cursorStep] <= t) {
         state.osmd.cursor.next();
         state.cursorStep++;
+        moved = true;
       }
     }
+    if (moved) syncCustomCursor(state);
 
-    // Debug live status: step + whether an OSMD cursor <img> is in the DOM
-    // and what its dimensions are. Helps diagnose "invisible cursor" cases.
-    if (state.statusEl && state.block) {
-      var osmdDiv = state.block.querySelector(".osmd-host");
-      var imgs = osmdDiv ? osmdDiv.querySelectorAll("img") : [];
-      var info = "no-img";
-      if (imgs.length) {
-        var last = imgs[imgs.length - 1];
-        info = imgs.length + "img " +
-          Math.round(last.getBoundingClientRect().width) + "x" +
-          Math.round(last.getBoundingClientRect().height) +
-          " @" + Math.round(parseFloat(last.style.left) || 0);
-      }
+    if (state.statusEl) {
       state.statusEl.textContent =
         "step " + state.cursorStep + "/" + state.timemap.length +
-        " t=" + t.toFixed(1) + " " + info;
+        " t=" + t.toFixed(1);
     }
 
     requestAnimationFrame(function () { syncLoop(state); });
