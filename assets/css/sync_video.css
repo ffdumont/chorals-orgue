@@ -47,19 +47,6 @@
 }
 .sync-block .osmd-host { height: 100%; position: relative; }
 
-/* Protect the OSMD cursor <img> from the Just-the-Docs theme, which
-   applies `img { max-width: 100%; height: auto }` globally and can
-   squash the cursor to 0 height. */
-.sync-block .osmd-host img {
-  max-width: none !important;
-  height: auto !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  border: 0 !important;
-  display: inline !important;
-}
-
 @media (max-width: 900px) {
   /* On narrow screens, stack: video on top, score below */
   .sync-block .sync-layout { flex-direction: column; }

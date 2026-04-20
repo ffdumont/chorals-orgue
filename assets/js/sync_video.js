@@ -72,14 +72,19 @@
         state.osmd = osmd;
         return osmd.load(xml).then(function () {
           osmd.render();
+          // Match what worked in the standalone proto: show() only, no reset().
           osmd.cursor.show();
-          osmd.cursor.reset();
           fitHeights(block, osmdDiv);
 
           var scoreWrap = block.querySelector(".score-wrap");
           if (scoreWrap) scoreWrap.scrollLeft = 0;
 
-          statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
+          // Debug snapshot: what did OSMD actually put in the container?
+          var imgCount = osmdDiv.querySelectorAll("img").length;
+          var svgCount = osmdDiv.querySelectorAll("svg").length;
+          statusEl.textContent =
+            "Partition OK (" + state.timemap.length + " onsets, " +
+            svgCount + " svg, " + imgCount + " img).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
@@ -158,6 +163,24 @@
         state.osmd.cursor.next();
         state.cursorStep++;
       }
+    }
+
+    // Debug live status: step + whether an OSMD cursor <img> is in the DOM
+    // and what its dimensions are. Helps diagnose "invisible cursor" cases.
+    if (state.statusEl && state.block) {
+      var osmdDiv = state.block.querySelector(".osmd-host");
+      var imgs = osmdDiv ? osmdDiv.querySelectorAll("img") : [];
+      var info = "no-img";
+      if (imgs.length) {
+        var last = imgs[imgs.length - 1];
+        info = imgs.length + "img " +
+          Math.round(last.getBoundingClientRect().width) + "x" +
+          Math.round(last.getBoundingClientRect().height) +
+          " @" + Math.round(parseFloat(last.style.left) || 0);
+      }
+      state.statusEl.textContent =
+        "step " + state.cursorStep + "/" + state.timemap.length +
+        " t=" + t.toFixed(1) + " " + info;
     }
 
     requestAnimationFrame(function () { syncLoop(state); });
