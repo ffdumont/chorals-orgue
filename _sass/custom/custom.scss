@@ -1,0 +1,22 @@
+// Surcharges appliquees APRES le theme just-the-docs.
+// Neutralise les contraintes de largeur residuelles pour remplir le
+// viewport sur ecrans larges.
+
+@media (min-width: 66.5rem) {
+  .main, .main-content, .main-content-wrap {
+    max-width: none !important;
+  }
+  // Leger padding a droite pour ne pas coller au bord du viewport
+  .main-content-wrap {
+    padding-right: 1.5rem;
+  }
+}
+
+// Sur tres grands ecrans, on ne centre PAS : on pousse a gauche
+// (plus d'espace pour le contenu, aligne avec la sidebar)
+@media (min-width: 100rem) {
+  .side-bar {
+    left: 0 !important;
+    right: auto !important;
+  }
+}

@@ -1,0 +1,9 @@
+// Surcharge les variables SCSS de just-the-docs avant que le theme ne
+// soit compile. Par defaut :
+//   $content-width: 50rem (800px) — main-content
+//   $nav-width:     16.5rem (264px) — sidebar
+// Sur ecrans larges, le layout par defaut laisse une grosse marge vide
+// a droite (et parfois a gauche si centre). On elargit.
+
+$content-width: 80rem;  // 1280px
+$nav-width: 18rem;      // 288px
