@@ -72,7 +72,7 @@
           osmd.render();
           osmd.cursor.show();
           forceCursorImgSize(osmdDiv);
-          fitScoreHeight(block, osmdDiv);
+          fitHeights(block, osmdDiv);
           statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
@@ -130,18 +130,21 @@
     }
   }
 
-  // Shrink the score wrapper to fit the actually-rendered SVG content so
-  // short examples (4 onsets on 2 staves) do not show a tall empty grey
-  // panel. Capped at ~65% of viewport height for long pieces like BWV 572.
-  function fitScoreHeight(block, osmdDiv) {
-    var wrap = block.querySelector(".score-wrap");
-    if (!wrap) return;
+  // Aligne les hauteurs partition ET video sur la hauteur rendue du
+  // premier systeme OSMD. La largeur de la video decoule de son
+  // aspect-ratio 16:9. Plancher 260px pour garder la video regardable
+  // meme sur les petites partitions, plafond 60vh / 520px.
+  function fitHeights(block, osmdDiv) {
+    var scoreWrap = block.querySelector(".score-wrap");
+    var videoWrap = block.querySelector(".video-wrap");
+    if (!scoreWrap) return;
     var svg = osmdDiv.querySelector("svg");
     var contentH = svg ? svg.getBoundingClientRect().height : osmdDiv.scrollHeight;
-    var minH = 160;
-    var maxH = Math.min(window.innerHeight * 0.65, 640);
+    var minH = 260;
+    var maxH = Math.min(window.innerHeight * 0.6, 520);
     var target = Math.max(minH, Math.min(contentH + 16, maxH));
-    wrap.style.height = target + "px";
+    scoreWrap.style.height = target + "px";
+    if (videoWrap) videoWrap.style.height = target + "px";
   }
 
   function resetCursorTo(state, t) {
