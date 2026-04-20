@@ -8,7 +8,6 @@
   var pendingForYt = [];
   var ytApiReady = false;
 
-  // Unique global callback for the YouTube iframe API
   window.onYouTubeIframeAPIReady = function () {
     ytApiReady = true;
     pendingForYt.splice(0).forEach(initYtPlayer);
@@ -26,7 +25,6 @@
     var midiKey = block.dataset.midiKey;
     var scoresBase = block.dataset.scoresBase || "/assets/scores/";
     var osmdDiv = block.querySelector(".osmd-host");
-    var playerIframe = block.querySelector(".sync-player");
     var offsetInput = block.querySelector(".offset-input");
     var cursorCheckbox = block.querySelector(".cursor-checkbox");
     var statusEl = block.querySelector(".status");
@@ -58,6 +56,10 @@
         var map = vals[1];
         state.timemap = map.onsets;
 
+        // Proto-style minimal config: OSMD's default cursor works here.
+        // We DO NOT use renderSingleHorizontalStaffline — it was breaking
+        // cursor visibility in some combinations. Score may wrap onto
+        // multiple systems; that's an acceptable trade-off for now.
         var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdDiv, {
           autoResize: false,
           drawTitle: false,
@@ -66,22 +68,7 @@
           followCursor: true,
           pageFormat: "Endless",
           drawingParameters: "compact",
-          renderSingleHorizontalStaffline: true,
-          // Make OSMD's internal cursor invisible (alpha=0). We draw our
-          // own visible overlay on top, positioned by syncCustomCursor().
-          cursorsOptions: [{
-            color: "#000000",
-            alpha: 0.0,
-            type: 0,
-            follow: true,
-          }],
         });
-        // Force single-line rendering (no wrap to new systems). Passing the
-        // option to the constructor is not always honored depending on OSMD
-        // build/version, so we also set the EngravingRules flag directly.
-        if (osmd.EngravingRules) {
-          osmd.EngravingRules.RenderSingleHorizontalStaffline = true;
-        }
         state.osmd = osmd;
         return osmd.load(xml).then(function () {
           osmd.render();
@@ -89,26 +76,15 @@
           osmd.cursor.reset();
           fitHeights(block, osmdDiv);
 
-          // Inject our custom visible cursor overlay inside .osmd-host.
-          var customCursor = document.createElement("div");
-          customCursor.className = "custom-cursor";
-          osmdDiv.appendChild(customCursor);
-          state.customCursor = customCursor;
-          state.osmdDiv = osmdDiv;
-
-          // Ensure the start of the score is visible initially.
           var scoreWrap = block.querySelector(".score-wrap");
           if (scoreWrap) scoreWrap.scrollLeft = 0;
 
-          // Initial cursor position
-          syncCustomCursor(state);
           statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
-              if (state.customCursor) {
-                state.customCursor.style.display = cursorCheckbox.checked ? "block" : "none";
-              }
+              if (cursorCheckbox.checked) osmd.cursor.show();
+              else osmd.cursor.hide();
             });
           }
 
@@ -143,10 +119,8 @@
     });
   }
 
-  // Fit the score-wrap to the actually-rendered single-system SVG height,
-  // and align the video-wrap to the same height. The video's 16:9 aspect
-  // ratio then drives its width. Minimum height keeps the video watchable
-  // even for very short / thin scores.
+  // Fit the score-wrap to the actually-rendered SVG height. The video-wrap
+  // is aligned to the same height; its 16:9 aspect ratio drives its width.
   function fitHeights(block, osmdDiv) {
     var scoreWrap = block.querySelector(".score-wrap");
     var videoWrap = block.querySelector(".video-wrap");
@@ -169,25 +143,6 @@
     }
   }
 
-  // Copy OSMD's internal cursor position onto our own visible overlay.
-  // OSMD renders its cursor as an <img> element absolutely positioned
-  // inside the container; we read its style.left/top/height and mirror
-  // them onto our .custom-cursor div.
-  function syncCustomCursor(state) {
-    if (!state.osmdDiv || !state.customCursor) return;
-    var imgs = state.osmdDiv.querySelectorAll("img");
-    if (!imgs.length) return;
-    // OSMD's cursor <img> is appended after the SVG; grab the last img.
-    var src = imgs[imgs.length - 1];
-    var left = parseFloat(src.style.left);
-    var top = parseFloat(src.style.top);
-    var height = parseFloat(src.style.height) || src.height;
-    if (isFinite(left)) state.customCursor.style.left = left + "px";
-    if (isFinite(top)) state.customCursor.style.top = top + "px";
-    if (isFinite(height) && height > 0) state.customCursor.style.height = height + "px";
-    state.customCursor.style.display = "block";
-  }
-
   function syncLoop(state) {
     if (!state.ytPlayer || typeof state.ytPlayer.getCurrentTime !== "function") {
       requestAnimationFrame(function () { syncLoop(state); });
@@ -196,27 +151,13 @@
     var offset = parseFloat(state.offsetInput.value) || 0;
     var t = state.ytPlayer.getCurrentTime() - offset;
 
-    var moved = false;
-    // Scrub backward -> rewind cursor from scratch
     if (state.cursorStep > 0 && state.timemap[state.cursorStep - 1] > t + 0.25) {
       resetCursorTo(state, t);
-      moved = true;
     } else {
       while (state.cursorStep < state.timemap.length && state.timemap[state.cursorStep] <= t) {
         state.osmd.cursor.next();
         state.cursorStep++;
-        moved = true;
       }
-    }
-    if (moved) syncCustomCursor(state);
-
-    // Live debug: step/total + t + cursor X (so we can see if the cursor
-    // is advancing at all).
-    if (state.statusEl) {
-      var cx = state.customCursor && state.customCursor.style.left || "?";
-      state.statusEl.textContent =
-        "step " + state.cursorStep + "/" + state.timemap.length +
-        "  t=" + t.toFixed(2) + "  x=" + cx;
     }
 
     requestAnimationFrame(function () { syncLoop(state); });

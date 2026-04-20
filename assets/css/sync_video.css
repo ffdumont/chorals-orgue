@@ -47,21 +47,17 @@
 }
 .sync-block .osmd-host { height: 100%; position: relative; }
 
-/* Curseur custom dessine en par-dessus le curseur OSMD (qu'on rend
-   transparent via alpha=0). Sa position est copiee a chaque frame depuis
-   le curseur OSMD interne (cf. syncCustomCursor dans sync_video.js).
-   Avantage : visible de maniere garantie, quoi que fasse OSMD. */
-.sync-block .custom-cursor {
-  position: absolute;
-  width: 3px;
-  background: rgba(230, 0, 38, 0.65);
-  box-shadow: 0 0 4px rgba(230, 0, 38, 0.5);
-  pointer-events: none;
-  z-index: 10;
-  display: none;
-  top: 0;
-  left: 0;
-  height: 100%;
+/* Protect the OSMD cursor <img> from the Just-the-Docs theme, which
+   applies `img { max-width: 100%; height: auto }` globally and can
+   squash the cursor to 0 height. */
+.sync-block .osmd-host img {
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  display: inline !important;
 }
 
 @media (max-width: 900px) {
