@@ -25,7 +25,7 @@ layout: table_wrappers
             {{ content }}
           {% endif %}
 
-          {% if page.url contains "/pieces/" or page.url contains "/demarche" %}
+          {% if page.url contains "/pieces/" %}
             <hr>
             <h2 id="commentaires">Commentaires</h2>
             {% include giscus.html %}

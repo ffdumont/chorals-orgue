@@ -32,9 +32,7 @@ chorals-orgue/
 ├── _layouts/default.html   # Ajoute Giscus aux pages de contenu
 ├── index.md                # Accueil
 ├── pieces/
-│   ├── demarche.md         # Narratif pédagogique
-│   ├── exemples-basiques.md # 4 exemples progressifs
-│   ├── bwv639.md           # BWV 639
+│   ├── bwv639.md           # BWV 639 + démarche pédagogique + 4 exemples progressifs (page fusionnée)
 │   └── setup-technique.md  # Doc technique (architecture, mappings MIDI)
 ├── assets/
 │   ├── audio/*.mp3         # Enregistrements

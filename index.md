@@ -13,16 +13,9 @@ Chaque page propose :
 - Un **lecteur audio** intégré (MP3)
 - Des **commentaires** en bas de page pour échanger
 
-## Pour commencer
+## Pièces
 
-**[La démarche — comprendre BWV 639 par la pratique](/chorals-orgue/demarche/)**
-
-Une page d'introduction qui explique comment quatre exemples musicaux simples permettent de décortiquer la mécanique d'un prélude de choral de Bach. À lire en premier si vous découvrez le sujet.
-
-## Pièces et exemples
-
-- [Exemples progressifs — 4 étapes pour comprendre](/chorals-orgue/pieces/exemples-basiques/)
-- [Bach — BWV 639 "Ich ruf zu dir, Herr Jesu Christ"](/chorals-orgue/pieces/bwv639/)
+- **[Bach — BWV 639 "Ich ruf zu dir, Herr Jesu Christ"](/chorals-orgue/pieces/bwv639/)** — une approche pédagogique en quatre étapes progressives pour décortiquer la mécanique du prélude de choral.
 
 ## Sous le capot
 
