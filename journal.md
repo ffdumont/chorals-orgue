@@ -11,6 +11,12 @@ Cette page recense les ajouts et modifications notables apportés au wiki : nouv
 
 ## 2026-04-20
 
+### Bascule MP3 → vidéos YouTube
+
+- Remplacement des lecteurs audio MP3 par des vidéos YouTube (non-répertoriées) embarquées en iframe : on voit désormais la console GrandOrgue avec les jeux tirés et les touches qui bougent pendant l'écoute.
+- Chaîne dédiée : [Chorals d'orgue](https://www.youtube.com/channel/UCDuYey5ZKESuB-ZyJrJrvUg).
+- Pipeline d'automatisation ajoutée : capture de l'écran GrandOrgue + audio loopback via `ffmpeg`/`soundcard`, upload YouTube via l'API Data v3, puis mise à jour automatique des pages markdown. Nouveaux scripts : `record_video.py`, `record_all_videos.py`, `youtube_auth.py`, `upload_youtube.py`, `update_embeds.py`.
+
 ### Page [Le projet](/chorals-orgue/projet/)
 
 - Ajout d'une page d'introduction décrivant la démarche d'ensemble : apprentissage de l'orgue en autodidacte, orgue virtuel et outils d'analyse MIDI assistés par IA.

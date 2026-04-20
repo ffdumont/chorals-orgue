@@ -8,3 +8,14 @@ Gemfile.lock
 node_modules/
 .DS_Store
 *.log
+
+# Secrets YouTube uploader
+scripts/client_secret.json
+scripts/token.json
+
+# MP4 de capture locale (source de verite = YouTube, cf. scripts/video_ids.yml)
+assets/video/
+
+# Python
+__pycache__/
+
