@@ -67,11 +67,12 @@
           pageFormat: "Endless",
           drawingParameters: "compact",
           renderSingleHorizontalStaffline: true,
-          // Bright, thick cursor so it remains visible on dense scores
+          // Bright, thick cursor so it remains visible on dense scores.
+          // type: 3 = TimeLine (thicker bar than the default thin line)
           cursorsOptions: [{
             color: "#e60026",
-            alpha: 0.45,
-            type: 0,
+            alpha: 0.55,
+            type: 3,
             follow: true,
           }],
         });
@@ -174,6 +175,16 @@
         state.cursorStep++;
       }
     }
+
+    // Live debug: show step/total + t so the user can see the cursor is
+    // actually advancing even if visually subtle. Removed by clicking
+    // the "Curseur visible" checkbox off then on (future improvement).
+    if (state.statusEl) {
+      state.statusEl.textContent =
+        "step " + state.cursorStep + "/" + state.timemap.length +
+        "  t=" + t.toFixed(2) + "s";
+    }
+
     requestAnimationFrame(function () { syncLoop(state); });
   }
 

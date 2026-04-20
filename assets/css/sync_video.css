@@ -40,9 +40,22 @@
      actually-rendered SVG (see fitHeights in sync_video.js). */
   height: 240px;
   overflow-x: auto;
-  overflow-y: hidden;
+  /* overflow-y: visible permet au curseur (dont la hauteur depasse
+     parfois celle des portees) de rester visible; on laisse scroll pour
+     couvrir les cas ou le contenu depasse tout de meme. */
+  overflow-y: auto;
 }
-.sync-block .osmd-host { height: 100%; }
+.sync-block .osmd-host { height: 100%; position: relative; }
+
+/* Force-visible cursor: OSMD dessine le curseur comme un element
+   positionne absolument dans son conteneur, avec un fond bleu pale par
+   defaut. On le surcharge pour qu'il soit bien visible sur toutes les
+   partitions, meme denses. */
+.sync-block .osmd-host img[id^="cursorImg"],
+.sync-block .osmd-host [id*="osmdCanvasVexFlowBackend"] + img {
+  opacity: 0.55 !important;
+  filter: hue-rotate(320deg) saturate(5) brightness(1.1) !important;
+}
 
 @media (max-width: 900px) {
   /* On narrow screens, stack: video on top, score below */
