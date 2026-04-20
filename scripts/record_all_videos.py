@@ -76,7 +76,8 @@ def chord3_sap(s, a, bass, dur):
     nof(1, s)
     time.sleep(dur * 0.08)
 
-def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=()):
+def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=(),
+                   tail=1.0):
     if stops_off_after is None:
         stops_off_after = stops_on
 
@@ -95,7 +96,7 @@ def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=()
 
     play_fn()
 
-    time.sleep(1.0)  # tail
+    time.sleep(tail)  # laisser mourir la reverbe avant de couper
     mp4 = os.path.join(OUT_DIR, f'{name}.mp4')
     rec.stop_and_save_mp4(mp4)
 
@@ -198,15 +199,17 @@ if __name__ == '__main__':
 
     SAP = ['GO_flute8', 'GO_bourdon8', 'PED_soubasse']
 
-    # (name, play_fn, stops, couplers)
+    # (name, play_fn, stops, couplers, tail)
     examples = [
-        ('exemple1', play_example1, SAP, ()),
-        ('exemple2', play_example2, SAP, ()),
-        ('exemple3', play_example3, SAP, ()),
-        ('exemple4', play_example4, SAP, ()),
-        ('bwv639',   play_bwv639,   SAP + ['PED_bourdon8'], ()),
+        ('exemple1', play_example1, SAP, (), 1.0),
+        ('exemple2', play_example2, SAP, (), 1.0),
+        ('exemple3', play_example3, SAP, (), 1.0),
+        ('exemple4', play_example4, SAP, (), 1.0),
+        ('bwv639',   play_bwv639,   SAP + ['PED_bourdon8'], (), 1.0),
+        # BWV 572 se termine sur un accord plein-jeu majestueux : on laisse
+        # mourir la reverbe des samples (5s) avant de couper la capture.
         ('bwv572_gravement', play_bwv572_gravement,
-         PRESETS['grand_plein_jeu'], PRESET_COUPLERS['grand_plein_jeu']),
+         PRESETS['grand_plein_jeu'], PRESET_COUPLERS['grand_plein_jeu'], 5.0),
     ]
 
     if only:
@@ -215,8 +218,8 @@ if __name__ == '__main__':
             print(f'Aucune piste ne correspond : {only}')
             sys.exit(1)
 
-    for name, fn, stops, couplers in examples:
-        record_example(name, fn, stops, couplers_on=couplers)
+    for name, fn, stops, couplers, tail in examples:
+        record_example(name, fn, stops, couplers_on=couplers, tail=tail)
 
     out.close()
     print(f'\n=== TERMINE === Fichiers dans : {OUT_DIR}')
