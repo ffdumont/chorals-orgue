@@ -103,7 +103,7 @@ Durée ~5-6 min, aucun son parasite pendant l'exécution. Résultat dans `assets
 ### Ajouter une nouvelle pièce
 
 1. Placer le fichier MIDI dans `assets/midi/`
-2. Générer la partition PNG : `"C:/Program Files/MuseScore 4/bin/MuseScore4.exe" fichier.mid -o fichier.png` (crée `fichier-1.png` pour la page 1)
+2. Générer la partition PNG : `"C:/Program Files/MuseScore 4/bin/MuseScore4.exe" fichier.mid -o fichier.png -T 10` (crée `fichier-1.png` pour la page 1). L'option `-T 10` recadre automatiquement l'image au contenu musical avec une marge de 10px — sans elle, MuseScore exporte la page A4 complète et laisse beaucoup de blanc sous la musique dans le wiki.
 3. Ajouter la page Markdown dans `pieces/` avec `<audio controls>` + `![partition]()`
 4. Enregistrer le MP3 (adapter `record_all.py` ou créer un nouveau script)
 5. Commit + push → GitHub Pages rebuild automatique (~1-2 min)

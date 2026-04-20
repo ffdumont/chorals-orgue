@@ -186,6 +186,18 @@ Pipeline complet qui enregistre tous les exemples du site en MP3. Pour chaque pi
 
 Le résultat : 5 fichiers MP3 dans `assets/audio/` produits sans aucune intervention manuelle.
 
+## Génération des partitions PNG
+
+Les partitions affichées dans les pages de pièces sont générées depuis les fichiers MIDI via MuseScore 4 en ligne de commande :
+
+```bash
+"C:/Program Files/MuseScore 4/bin/MuseScore4.exe" fichier.mid -o fichier.png -T 10
+```
+
+L'option **`-T 10`** recadre automatiquement le PNG au contenu musical avec une marge de 10 pixels. Sans elle, MuseScore exporte la page A4 entière (la musique n'occupe qu'un quart en haut, tout le reste est blanc), ce qui produit un gros vide sous la partition dans le wiki.
+
+MuseScore génère un fichier par page en suffixant `-1`, `-2`, etc. au nom de sortie — pour les exemples courts de ce site, seule la page 1 existe (`exemple1-1.png`).
+
 ## Reproductibilité
 
 Pour répliquer ce setup sur une machine Windows :
