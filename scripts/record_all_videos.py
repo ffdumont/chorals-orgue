@@ -17,8 +17,8 @@ import random
 import time
 
 from record_video import VideoRecorder
-from stops_control import (Stops, CC_STOPS, CC_COUPLERS, STOPS_CHANNEL,
-                            PRESETS, PRESET_COUPLERS)
+from stops_control_sjdl import (Stops, CC_STOPS, CC_COUPLERS, STOPS_CHANNEL,
+                                 PRESETS, PRESET_COUPLERS)
 
 OUT_DIR = r'D:/Projects/chorals-orgue/assets/video'
 os.makedirs(OUT_DIR, exist_ok=True)

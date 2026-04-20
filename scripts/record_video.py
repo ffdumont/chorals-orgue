@@ -134,7 +134,7 @@ def _play_midi_file(path, port_name='loopMIDI Port 1', preset=None):
     """Mini-lecteur pour l'usage CLI. Pour les scripts avances, utiliser
     directement VideoRecorder et jouer le MIDI depuis le script appelant."""
     import mido
-    from stops_control import Stops, PRESETS
+    from stops_control_sjdl import Stops, PRESETS
 
     out = mido.open_output(port_name)
     stops = None

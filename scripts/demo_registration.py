@@ -4,13 +4,13 @@ Joue une courte improvisation en 5 phases avec registration dynamique :
 intime -> enrichissement -> brillance -> grand plein-jeu -> retour au calme.
 
 Requiert l'orgue Saint-Jean-de-Luz charge dans GrandOrgue,
-avec le mapping MIDI decrit dans stops_control.py.
+avec le mapping MIDI decrit dans stops_control_sjdl.py.
 """
 import mido
 import time
 import random
 
-from stops_control import Stops
+from stops_control_sjdl import Stops
 
 GO = 1   # canal MIDI 2 (= manuel Grand Orgue)
 PED = 0  # canal MIDI 1 (= pedalier)

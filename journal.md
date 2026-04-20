@@ -11,11 +11,18 @@ Cette page recense les ajouts et modifications notables apportés au wiki : nouv
 
 ## 2026-04-20
 
+### Page [BWV 572 — Pièce d'orgue (Gravement)](/chorals-orgue/pieces/bwv572/) — version Bégard
+
+- Ajout d'une **deuxième version** du *Gravement* jouée sur le grand orgue romantique Mutin 1899 de Bégard (banque démo Piotr Grabowski, 10 jeux échantillonnés sur 21). La page est restructurée pour présenter en miroir les deux versions ("orgue de chœur vs grand orgue") et compare ce qu'on entend de différent : Saint-Jean-de-Luz brillante avec ses mutations et sa mixture, Bégard plus ronde et chantante dans la tradition Cavaillé-Coll/Mutin.
+- Registration Bégard : tous les fonds disponibles au Grand-Orgue (Bourdon 16, Montre 8, Bourdon 8, Prestant 4, Doublette 2), Soubasse 16 + Basse 8 à la Pédale, accouplement I/P. Récit non utilisé (sans mixture ni anche échantillonnées en démo).
+- Mise en scène ajoutée à l'enregistrement : déclenchement de l'**Annulateur Général** au démarrage avec le petit clic mécanique audible, puis tirage des jeux un par un avant la pause contemplative qui précède la musique.
+- Côté code : nouveau module [scripts/stops_control_begard.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/stops_control_begard.py) (mapping MIDI Bégard, A.G. sur CC 63 comme SJDL), renommage de `stops_control.py` en `stops_control_sjdl.py`, scripts dédiés [test_begard.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/test_begard.py) et [record_bwv572_begard.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/record_bwv572_begard.py). Le même fichier MIDI `bwv572_gravement.mid` est rejoué tel quel sur les deux orgues — seule la registration change.
+
 ### Page [BWV 572 — Pièce d'orgue (Gravement)](/chorals-orgue/pieces/bwv572/)
 
 - Ajout d'une démo "grand plein-jeu" avec 15 des 17 jeux de l'orgue de Saint-Jean-de-Luz (88 %) : tous les jeux du Grand Orgue et du Récit (y compris la Trompette 8 pour plus d'éclat), fonds de Pédale, avec accouplements II/I et I/P.
 - Section *Gravement* extraite automatiquement du MIDI complet (séquence Dean Lampe, Kunst der Fuge) par détection de frontière entre les sections (changement de mesure 12/8 → 4/4 et densité de notes).
-- Nouveau preset `grand_plein_jeu` dans [scripts/stops_control.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/stops_control.py) avec accouplements associés via `PRESET_COUPLERS`. Extension de [scripts/play_midi.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/play_midi.py) et [scripts/record_all_videos.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/record_all_videos.py) pour gérer les accouplements dans un preset.
+- Nouveau preset `grand_plein_jeu` dans [scripts/stops_control_sjdl.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/stops_control_sjdl.py) avec accouplements associés via `PRESET_COUPLERS`. Extension de [scripts/play_midi.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/play_midi.py) et [scripts/record_all_videos.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/record_all_videos.py) pour gérer les accouplements dans un preset.
 
 ### Bascule MP3 → vidéos YouTube
 

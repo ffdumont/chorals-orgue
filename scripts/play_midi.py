@@ -6,13 +6,13 @@ Usage :
     python play_midi.py chemin/vers/fichier.mid --stops doux
 
 L'option --stops tire une registration predefinie avant la lecture :
-    doux, fonde, plein_jeu, grand_plein_jeu (voir stops_control.py)
+    doux, fonde, plein_jeu, grand_plein_jeu (voir stops_control_sjdl.py)
 """
 import argparse
 import mido
 import time
 
-from stops_control import Stops, PRESETS, PRESET_COUPLERS
+from stops_control_sjdl import Stops, PRESETS, PRESET_COUPLERS
 
 
 def play(path, port_name='loopMIDI Port 1', preset=None):
