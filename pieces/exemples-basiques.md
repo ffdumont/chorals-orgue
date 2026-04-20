@@ -19,9 +19,12 @@ Structure de base : quatre voix (SATB) en rondes, une par mesure.
 
 ![Partition exemple 1](/chorals-orgue/assets/images/exemple1-1.png)
 
-**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple1.mp3) — *(à enregistrer)*
+<audio controls style="width: 100%;">
+  <source src="/chorals-orgue/assets/audio/exemple1.mp3" type="audio/mpeg">
+  Votre navigateur ne supporte pas la lecture audio.
+</audio>
 
-**Fichier MIDI** : [exemple1.mid](/chorals-orgue/assets/midi/exemple1.mid)
+[Télécharger le MIDI](/chorals-orgue/assets/midi/exemple1.mid)
 
 ---
 
@@ -31,9 +34,11 @@ On retire le ténor. La soprano prend un mouvement mélodique **Do – Ré – M
 
 ![Partition exemple 2](/chorals-orgue/assets/images/exemple2-1.png)
 
-**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple2.mp3) — *(à enregistrer)*
+<audio controls style="width: 100%;">
+  <source src="/chorals-orgue/assets/audio/exemple2.mp3" type="audio/mpeg">
+</audio>
 
-**Fichier MIDI** : [exemple2.mid](/chorals-orgue/assets/midi/exemple2.mid)
+[Télécharger le MIDI](/chorals-orgue/assets/midi/exemple2.mid)
 
 ---
 
@@ -43,9 +48,11 @@ Même harmonie que l'exemple 2, mais la soprano est **ornementée** de broderies
 
 ![Partition exemple 3](/chorals-orgue/assets/images/exemple3-1.png)
 
-**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple3.mp3) — *(à enregistrer)*
+<audio controls style="width: 100%;">
+  <source src="/chorals-orgue/assets/audio/exemple3.mp3" type="audio/mpeg">
+</audio>
 
-**Fichier MIDI** : [exemple3.mid](/chorals-orgue/assets/midi/exemple3.mid)
+[Télécharger le MIDI](/chorals-orgue/assets/midi/exemple3.mid)
 
 ---
 
@@ -55,9 +62,11 @@ Ajout de la **basse pizzicato** (notes détachées régulières) — l'élément
 
 ![Partition exemple 4](/chorals-orgue/assets/images/exemple4-1.png)
 
-**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple4.mp3) — *(à enregistrer)*
+<audio controls style="width: 100%;">
+  <source src="/chorals-orgue/assets/audio/exemple4.mp3" type="audio/mpeg">
+</audio>
 
-**Fichier MIDI** : [exemple4.mid](/chorals-orgue/assets/midi/exemple4.mid)
+[Télécharger le MIDI](/chorals-orgue/assets/midi/exemple4.mid)
 
 ---
 
@@ -76,4 +85,4 @@ Tous les exemples sont enregistrés avec la même registration pour que seule la
 - **Grand Orgue** : Flûte harmonique 8' + Bourdon 8'
 - **Pédale** : Soubasse 16' (seulement quand la basse est séparée)
 
-Orgue : Saint-Jean-de-Luz (Choeur), échantillons Piotr Grabowski, hébergés dans GrandOrgue.
+Orgue : **Saint-Jean-de-Luz (Choeur)**, échantillons Piotr Grabowski, hébergés dans GrandOrgue.

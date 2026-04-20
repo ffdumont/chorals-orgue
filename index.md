@@ -9,23 +9,27 @@ nav_order: 1
 Bienvenue sur ce petit wiki dédié au répertoire d'orgue, avec un accent particulier sur les chorals de Bach et les explorations pédagogiques autour de l'écriture à plusieurs voix.
 
 Chaque page propose :
-- La **partition** (PDF, image, parfois MusicXML)
-- Un ou plusieurs **enregistrements audio**
-- Des **commentaires** (en bas de page) pour échanger
+- La **partition** inline
+- Un **lecteur audio** intégré (MP3)
+- Des **commentaires** en bas de page pour échanger
 
 ## Pour commencer
 
-**[La démarche — comprendre BWV 639 par la pratique](demarche/)**
+**[La démarche — comprendre BWV 639 par la pratique](/chorals-orgue/demarche/)**
 
 Une page d'introduction qui explique comment quatre exemples musicaux simples permettent de décortiquer la mécanique d'un prélude de choral de Bach. À lire en premier si vous découvrez le sujet.
 
 ## Pièces et exemples
 
-- [Exemples progressifs — 4 étapes pour comprendre](pieces/exemples-basiques/)
-- [Bach — BWV 639 "Ich ruf zu dir, Herr Jesu Christ"](pieces/bwv639/)
+- [Exemples progressifs — 4 étapes pour comprendre](/chorals-orgue/pieces/exemples-basiques/)
+- [Bach — BWV 639 "Ich ruf zu dir, Herr Jesu Christ"](/chorals-orgue/pieces/bwv639/)
+
+## Sous le capot
+
+- [Setup technique](/chorals-orgue/setup/) — l'architecture logicielle, les mappings MIDI, les scripts Python
 
 ## À propos
 
-Site réalisé avec Jekyll + Just the Docs, hébergé sur GitHub Pages. Les enregistrements sont réalisés avec **GrandOrgue** sur la banque d'échantillons **Saint-Jean-de-Luz (choeur)** de Piotr Grabowski.
+Site réalisé avec Jekyll + Just the Docs, hébergé sur GitHub Pages. Les enregistrements sont réalisés avec **GrandOrgue** sur la banque d'échantillons **Saint-Jean-de-Luz (Choeur)** de Piotr Grabowski, pilotés en MIDI par des scripts Python.
 
-Les commentaires en bas de chaque page utilisent **Giscus** (système basé sur GitHub Discussions). Pour commenter, il suffit d'avoir un compte GitHub.
+Les commentaires en bas de chaque page utilisent **Giscus** (basé sur GitHub Discussions) — il suffit d'avoir un compte GitHub pour commenter.
