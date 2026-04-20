@@ -79,29 +79,57 @@
           osmd.cursor.show();
           fitHeights(block, osmdDiv);
 
-          // Build our own visible cursor overlay. Fully inline styles so
-          // no CSS rule from the theme can interfere.
+          var scoreWrap = block.querySelector(".score-wrap");
+          // DEBUG: wide red bar to confirm our overlay shows up at all.
+          // If this is invisible, something structural is wrong (stacking,
+          // overflow, or element not actually appended); if it shows, we
+          // can narrow it down and position it via OSMD cursor's location.
           var customCursor = document.createElement("div");
           customCursor.style.cssText =
             "position:absolute;" +
-            "width:4px;" +
-            "background:rgba(230,0,38,0.7);" +
-            "box-shadow:0 0 6px rgba(230,0,38,0.5);" +
+            "width:40px;" +           // wide for visibility test
+            "background:red;" +       // solid red, no transparency
             "pointer-events:none;" +
-            "z-index:1000;" +
+            "z-index:9999;" +
+            "top:0;" +
+            "left:0;" +
+            "height:100%;" +
+            "display:block;" +
+            "box-shadow:0 0 0 2px yellow;";  // yellow outline
+          osmdDiv.appendChild(customCursor);
+
+          // Also attach to .score-wrap as a secondary test in case
+          // something scopes or hides things inside .osmd-host.
+          var fallbackCursor = document.createElement("div");
+          fallbackCursor.style.cssText =
+            "position:absolute;" +
+            "width:6px;" +
+            "background:magenta;" +
+            "pointer-events:none;" +
+            "z-index:9998;" +
             "top:0;" +
             "left:0;" +
             "height:100%;" +
             "display:block;";
-          osmdDiv.appendChild(customCursor);
+          if (scoreWrap) {
+            scoreWrap.style.position = "relative";
+            scoreWrap.appendChild(fallbackCursor);
+          }
+          state.fallbackCursor = fallbackCursor;
           state.customCursor = customCursor;
           state.osmdDiv = osmdDiv;
 
-          var scoreWrap = block.querySelector(".score-wrap");
           if (scoreWrap) scoreWrap.scrollLeft = 0;
 
-          syncCustomCursor(state);
-          statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
+          // Report DOM tree so we can see what's actually inside osmd-host
+          var kids = Array.prototype.map.call(osmdDiv.children, function(c){
+            return c.tagName.toLowerCase() +
+              (c.id ? "#" + c.id : "") +
+              (c.className && typeof c.className === "string" ? "." + c.className : "");
+          }).join(", ");
+          statusEl.textContent =
+            "onsets=" + state.timemap.length +
+            " | osmd-host children: " + kids;
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
