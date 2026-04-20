@@ -11,16 +11,16 @@ Ce wiki accompagne un projet personnel d'apprentissage de l'orgue en autodidacte
 
 ## Contexte
 
-- **Profil** : piano pendant l'enfance (~10 ans), reprise à 50 ans après une longue interruption. Culture musicale latente (lecture, tonalité, oreille), motricité à reconstruire.
+- **Profil** : piano pendant l'enfance, reprise à l'âge adulte après une longue interruption. Culture musicale latente (lecture, tonalité, oreille), motricité à reconstruire.
 - **Instrument** : clavier Native Instruments lesté, **pas de pédalier** pour l'instant, GrandOrgue configuré avec la banque Saint-Jean-de-Luz (Choeur) de Piotr Grabowski.
 - **Objectif de fond** : jouer les chorals de Bach.
 - **Modalité** : auto-apprentissage, sans professeur régulier.
 
 ## Cadrage réaliste
 
-Reprise adulte après 40 ans d'interruption ≈ redémarrage technique depuis zéro, mais avec des acquis préservés (lecture deux clés, structure tonale, coordination bimanuelle de base). La plasticité motrice existe à 50 ans mais demande **régularité plutôt qu'intensité** : 20 min/jour > 2h le dimanche. C'est précisément là qu'un outil bien conçu peut avoir un impact élevé.
+Reprise adulte après une longue interruption ≈ redémarrage technique depuis zéro, mais avec des acquis préservés (lecture deux clés, structure tonale, coordination bimanuelle de base). La progression passe avant tout par la **régularité** — c'est précisément là qu'un outil bien conçu peut avoir un impact élevé.
 
-Sans pédalier, les chorals de Bach ne sont jouables que partiellement. Un pédalier MIDI (400–1500 €, ou DIY) devient pertinent à échéance de 8–12 mois, une fois la technique manuelle suffisamment développée pour en tirer parti. Le clavier lesté construit par ailleurs des réflexes de frappe qu'il faudra désapprendre sur un orgue réel à traction mécanique — à garder en tête sans en faire un blocage.
+Sans pédalier, les chorals de Bach ne sont jouables que partiellement. Un pédalier MIDI (achat ou DIY) deviendra pertinent à un moment, une fois la technique manuelle suffisamment développée pour en tirer parti. Le clavier lesté construit par ailleurs des réflexes de frappe qu'il faudra désapprendre sur un orgue réel à traction mécanique — à garder en tête sans en faire un blocage.
 
 ## Les cinq axes de développement
 
@@ -34,7 +34,7 @@ Tapper le flux MIDI entre clavier et GrandOrgue (loopMIDI, `mido`), aligner la p
 - longueur réelle des notes (articulation),
 - synchronisation main/pied (à terme).
 
-Sans cette couche de mesure, tout le reste reste qualitatif. Pour une reprise adulte, c'est aussi le **levier motivationnel principal** : voir les métriques progresser semaine après semaine entretient une pratique quotidienne sur deux ans.
+Sans cette couche de mesure, tout le reste reste qualitatif. Pour une reprise adulte, c'est aussi le **levier motivationnel principal** : voir les métriques progresser dans la durée entretient la pratique régulière.
 
 ### 2. Travail de l'indépendance des voix
 
@@ -52,16 +52,16 @@ Génération de doigtés organistiques (substitutions, glissements, doigts muets
 
 Couche englobante reliant tout le reste : déclaration d'un objectif → captation → analyse déterministe (JSON) → diagnostic pédagogique et exercice suivant proposés par Claude via API ou CLI. Outils déterministes pour la mesure, LLM pour l'interprétation et la décision pédagogique.
 
-## Trajectoire proposée sur 6 mois
+## Trajectoire proposée
 
-| Période | Briques techniques | Répertoire |
-|---|---|---|
-| Mois 1–2 | Capture MIDI + dashboard minimal (notes justes, régularité rythmique, progression hebdomadaire) | Exercices à 1 puis 2 voix, très courts. Gammes, petits préludes |
-| Mois 3–4 | Analyse d'articulation (longueur réelle des notes, overlap) | Peeters *Ars Organi*, petits chorals à 2 voix, Kaller *Orgelschule* vol. 1 |
-| Mois 5–6 | Couche coach via Claude : lecture des métriques, proposition de l'exercice suivant | Premier choral simple à 3 voix (2 mains + 1 voix pré-enregistrée) |
-| Mois 8–12 | Intégration pédalier (si acquis) | Élargissement progressif au répertoire avec pédale |
+Une progression par phases plutôt qu'un calendrier chiffré, chaque phase s'installant au rythme qui convient :
 
-**Ne pas viser les chorals de Bach tout de suite.** Ils restent l'objectif de fond, mais techniquement ils demandent une indépendance des mains de niveau intermédiaire-avancé. Répertoire de démarrage adapté à une reprise adulte : Peeters *Ars Organi* (explicitement conçu pour adultes), Dupré *79 Chorals*, les *Acht kleine Präludien und Fugen* BWV 553–560 (longtemps attribués à Bach), Pachelbel, versets de Couperin, chorals simples à 2 voix de l'*Orgelbüchlein*.
+- **Phase initiale** — capture MIDI et dashboard minimal (notes justes, régularité rythmique). Côté répertoire : exercices à une puis deux voix, gammes, petits préludes.
+- **Phase suivante** — analyse d'articulation (longueur réelle des notes, recouvrement). Répertoire : Peeters *Ars Organi*, petits chorals à deux voix, Kaller *Orgelschule* vol. 1.
+- **Phase coach** — couche d'interprétation des métriques par Claude, proposition d'exercices. Répertoire : premier choral simple à trois voix (deux mains + une voix pré-enregistrée).
+- **Phase pédalier** (si acquis) — intégration progressive de la pédale et élargissement du répertoire.
+
+**Ne pas viser les chorals de Bach tout de suite.** Ils restent l'objectif de fond, mais techniquement ils demandent une indépendance des mains de niveau intermédiaire-avancé. Répertoire de démarrage adapté à une reprise adulte : Peeters *Ars Organi* (explicitement conçu pour adultes), Dupré *79 Chorals*, les *Acht kleine Präludien und Fugen* BWV 553–560 (longtemps attribués à Bach), Pachelbel, versets de Couperin, chorals simples à deux voix de l'*Orgelbüchlein*.
 
 ## Priorisation des briques techniques
 
@@ -73,7 +73,7 @@ Couche englobante reliant tout le reste : déclaration d'un objectif → captati
 
 ## Un angle mort assumé
 
-L'outil IA compense mal ce qui ne se mesure pas en MIDI : position du corps, frappe, mouvements de main, posture assise. Une ou deux **leçons ponctuelles de diagnostic** avec un organiste (pas un cours régulier — juste 1 à 2 séances, ou un œil extérieur sur des vidéos) corrigeraient en présentiel des défauts qu'on entretient mal seul pendant des mois. À envisager à un moment.
+L'outil IA compense mal ce qui ne se mesure pas en MIDI : position du corps, frappe, mouvements de main, posture assise. Quelques **leçons ponctuelles de diagnostic** avec un organiste (pas un cours régulier — juste un œil extérieur, en présentiel ou sur des vidéos) corrigeraient des défauts qu'on entretient mal seul dans la durée. À envisager à un moment.
 
 ## En pratique sur ce site
 
