@@ -13,26 +13,12 @@ Cette page documente l'architecture logicielle utilisée pour produire les enreg
 
 Le flux complet ressemble à ceci :
 
-```
-┌─────────────┐       MIDI       ┌──────────┐       MIDI       ┌─────────────┐
-│   Script    │  ───────────►   │ loopMIDI │  ───────────►    │ GrandOrgue  │
-│   Python    │     (notes,     │   Port 1 │   (entree MIDI   │ + orgue     │
-│   (mido)    │      CC jeux)   │ (virtuel)│    virtuelle)    │ Saint-Jean- │
-└─────────────┘                  └──────────┘                  │    de-Luz   │
-                                                                └──────┬──────┘
-                                                                       │ audio
-                                                                       ▼
-                                                           ┌─────────────────────┐
-                                                           │ Sortie audio        │
-                                                           │ systeme (WASAPI)    │
-                                                           └───────┬─────────────┘
-                                                                   │ loopback
-                                                                   ▼
-                                                           ┌─────────────────────┐
-                                                           │ Script Python       │
-                                                           │ (soundcard +        │
-                                                           │  ffmpeg -> MP3)     │
-                                                           └─────────────────────┘
+```mermaid
+flowchart TD
+    A["Script Python<br/>(mido)"] -->|"MIDI<br/>(notes + CC jeux)"| B["loopMIDI Port<br/>(pilote virtuel)"]
+    B -->|"MIDI<br/>(entrée virtuelle)"| C["GrandOrgue<br/>+ orgue Saint-Jean-de-Luz"]
+    C -->|audio| D["Sortie audio système<br/>(WASAPI)"]
+    D -->|loopback| E["Script Python<br/>(soundcard + ffmpeg → MP3)"]
 ```
 
 Chaque composant a un rôle précis :
@@ -98,6 +84,20 @@ pip install mido python-rtmidi soundcard soundfile
 ## Configuration MIDI de GrandOrgue
 
 Une fois l'orgue chargé dans GrandOrgue, il faut **apprendre** à chaque clavier et à chaque jeu un événement MIDI spécifique (fonction "MIDI Learn"). Voici les mappings configurés pour ce projet.
+
+Vue d'ensemble du routing MIDI :
+
+```mermaid
+flowchart LR
+    S["Script Python"]
+    S -->|"canal 1<br/>Note On/Off"| PED["Clavier Pédale"]
+    S -->|"canal 2<br/>Note On/Off"| GO["Clavier Grand Orgue"]
+    S -->|"canal 16<br/>Control Change 127"| JX{{"Jeux (tirants)"}}
+    JX -->|"CC 20–26"| JGO["7 jeux Grand Orgue<br/>Bourdon 16, Flûte h. 8, Bourdon 8,<br/>Prestant 4, Quinte 2 2/3, Doublette 2, Tierce"]
+    JX -->|"CC 27–30"| JREC["4 jeux Récit<br/>Flûte 8, Flûte 4,<br/>Plein-jeu III, Trompette 8"]
+    JX -->|"CC 31"| TREM["Tremblant (global)"]
+    JX -->|"CC 40–44"| JPED["5 jeux Pédale<br/>Soubasse 16, Flûte 8,<br/>Bourdon 8, Flûte 4, Flûte 2"]
+```
 
 ### Claviers (Note On / Note Off)
 

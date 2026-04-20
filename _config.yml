@@ -13,6 +13,8 @@ plugins:
 color_scheme: light
 search_enabled: true
 heading_anchors: true
+mermaid:
+  version: "10.9.0"
 nav_external_links:
   - title: GitHub
     url: https://github.com/ffdumont/chorals-orgue
