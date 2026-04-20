@@ -71,12 +71,13 @@
         return osmd.load(xml).then(function () {
           osmd.render();
           osmd.cursor.show();
+          forceCursorImgSize(osmdDiv);
           fitScoreHeight(block, osmdDiv);
           statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
-              if (cursorCheckbox.checked) osmd.cursor.show();
+              if (cursorCheckbox.checked) { osmd.cursor.show(); forceCursorImgSize(osmdDiv); }
               else osmd.cursor.hide();
             });
           }
@@ -110,6 +111,23 @@
         },
       },
     });
+  }
+
+  // OSMD draws the cursor as a small <img> (typically 30x1 px canvas)
+  // whose rendered height is controlled via the HTML `height` attribute.
+  // Just-the-Docs applies `img { height: auto }` which overrides that
+  // attribute, collapsing the cursor to 1px and making it invisible.
+  // Promote the attribute to an inline style, which beats the theme CSS.
+  function forceCursorImgSize(osmdDiv) {
+    var imgs = osmdDiv.querySelectorAll("img");
+    for (var i = 0; i < imgs.length; i++) {
+      var img = imgs[i];
+      var h = img.getAttribute("height");
+      var w = img.getAttribute("width");
+      if (h) img.style.setProperty("height", h + "px", "important");
+      if (w) img.style.setProperty("width", w + "px", "important");
+      img.style.setProperty("max-width", "none", "important");
+    }
   }
 
   // Shrink the score wrapper to fit the actually-rendered SVG content so
