@@ -1,8 +1,7 @@
 ---
 layout: default
 title: Exemples progressifs
-parent: Pièces
-nav_order: 2
+nav_order: 3
 permalink: /pieces/exemples-basiques/
 ---
 
@@ -10,55 +9,57 @@ permalink: /pieces/exemples-basiques/
 
 Quatre exemples pédagogiques construits en Fa majeur sur la progression harmonique basique **I – IV – V – I**. Chaque étape ajoute **un seul concept** pour faire comprendre comment Bach construit un "choral prélude" comme BWV 639.
 
-## Exemple 1 : Choral à 4 voix
+Pour le contexte et les explications détaillées : voir [La démarche](/chorals-orgue/demarche/).
+
+---
+
+## Exemple 1 — Choral à 4 voix
 
 Structure de base : quatre voix (SATB) en rondes, une par mesure.
 
-![Exemple 1](/chorals-orgue/assets/images/exemple1-preview.png)
+![Partition exemple 1](/chorals-orgue/assets/images/exemple1-1.png)
 
-<audio controls>
-  <source src="/chorals-orgue/assets/audio/exemple1.mp3" type="audio/mpeg">
-</audio>
+**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple1.mp3) — *(à enregistrer)*
 
-**Ce que ça illustre** : la verticalité harmonique, le squelette d'un choral.
+**Fichier MIDI** : [exemple1.mid](/chorals-orgue/assets/midi/exemple1.mid)
 
-## Exemple 2 : Choral à 3 voix
+---
+
+## Exemple 2 — Choral à 3 voix
 
 On retire le ténor. La soprano prend un mouvement mélodique **Do – Ré – Mi – Fa**.
 
-![Exemple 2](/chorals-orgue/assets/images/exemple2-preview.png)
+![Partition exemple 2](/chorals-orgue/assets/images/exemple2-1.png)
 
-<audio controls>
-  <source src="/chorals-orgue/assets/audio/exemple2.mp3" type="audio/mpeg">
-</audio>
+**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple2.mp3) — *(à enregistrer)*
 
-**Ce que ça illustre** : l'écriture à 3 voix (soprano, alto, basse), celle de BWV 639.
+**Fichier MIDI** : [exemple2.mid](/chorals-orgue/assets/midi/exemple2.mid)
 
-## Exemple 3 : Choral orné
+---
+
+## Exemple 3 — Choral orné
 
 Même harmonie que l'exemple 2, mais la soprano est **ornementée** de broderies en croches autour des notes principales.
 
-![Exemple 3](/chorals-orgue/assets/images/exemple3-preview.png)
+![Partition exemple 3](/chorals-orgue/assets/images/exemple3-1.png)
 
-<audio controls>
-  <source src="/chorals-orgue/assets/audio/exemple3.mp3" type="audio/mpeg">
-</audio>
+**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple3.mp3) — *(à enregistrer)*
 
-**Ce que ça illustre** : le principe du "prélude de choral" — transformer une mélodie simple par l'ornementation.
+**Fichier MIDI** : [exemple3.mid](/chorals-orgue/assets/midi/exemple3.mid)
 
-## Exemple 4 : Style BWV 639
+---
+
+## Exemple 4 — Style BWV 639
 
 Ajout de la **basse pizzicato** (notes détachées régulières) — l'élément rythmique signature du choral de Bach.
 
-![Exemple 4](/chorals-orgue/assets/images/exemple4-preview.png)
+![Partition exemple 4](/chorals-orgue/assets/images/exemple4-1.png)
 
-[Télécharger le MIDI](/chorals-orgue/assets/scores/exemple4.mid)
+**Enregistrement** : [écouter (MP3)](/chorals-orgue/assets/audio/exemple4.mp3) — *(à enregistrer)*
 
-<audio controls>
-  <source src="/chorals-orgue/assets/audio/exemple4.mp3" type="audio/mpeg">
-</audio>
+**Fichier MIDI** : [exemple4.mid](/chorals-orgue/assets/midi/exemple4.mid)
 
-**Ce que ça illustre** : la synthèse complète des éléments de BWV 639 dans une forme pédagogique simplifiée.
+---
 
 ## Récapitulatif
 
@@ -69,6 +70,10 @@ Ajout de la **basse pizzicato** (notes détachées régulières) — l'élément
 | 3 | 3 | **ornementée** | ronde |
 | 4 | 3 | ornementée | **pizzicato** |
 
-## Commentaires
+## Registration utilisée
 
-<div class="giscus"></div>
+Tous les exemples sont enregistrés avec la même registration pour que seule la différence d'écriture soit audible :
+- **Grand Orgue** : Flûte harmonique 8' + Bourdon 8'
+- **Pédale** : Soubasse 16' (seulement quand la basse est séparée)
+
+Orgue : Saint-Jean-de-Luz (Choeur), échantillons Piotr Grabowski, hébergés dans GrandOrgue.
