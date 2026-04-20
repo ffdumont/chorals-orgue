@@ -15,6 +15,8 @@ Cette page recense les ajouts et modifications notables apportés au wiki : nouv
 
 - Ajout d'une page d'introduction décrivant la démarche d'ensemble : apprentissage de l'orgue en autodidacte, orgue virtuel et outils d'analyse MIDI assistés par IA.
 - Lien mis en avant depuis l'accueil.
+- **Révision** : retrait des objectifs chiffrés (durées, prix, calendrier) pour enlever toute pression inutile.
+- **Révision** : reformulation moins technique et plus musicale, à destination des mélomanes familiers de l'enseignement classique de l'orgue (vocabulaire organistique, la tradition posée comme boussole, l'outil comme complément du maître).
 
 ### Page [Setup technique](/chorals-orgue/setup/)
 
