@@ -8,6 +8,8 @@ nav_order: 1
 
 Bienvenue sur ce petit wiki dédié au répertoire d'orgue, avec un accent particulier sur les chorals de Bach et les explorations pédagogiques autour de l'écriture à plusieurs voix.
 
+Pour comprendre la démarche d'ensemble — apprentissage de l'orgue en autodidacte avec un orgue virtuel et des outils d'analyse MIDI — voir [Le projet](/chorals-orgue/projet/).
+
 Chaque page propose :
 - La **partition** inline
 - Un **lecteur audio** intégré (MP3)
@@ -20,6 +22,7 @@ Chaque page propose :
 ## Sous le capot
 
 - [Setup technique](/chorals-orgue/setup/) — l'architecture logicielle, les mappings MIDI, les scripts Python
+- [Journal](/chorals-orgue/journal/) — ajouts et modifications du wiki au fil du temps
 
 ## À propos
 
