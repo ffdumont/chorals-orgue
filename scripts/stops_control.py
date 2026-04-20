@@ -39,6 +39,21 @@ CC_STOPS = {
 
 STOPS_CHANNEL = 15  # canal MIDI 16 (index 15)
 
+# Accouplements (Control Change, canal 16)
+# Comme pour les jeux : value 127 = toggle (MIDI-learn fait avec 127)
+CC_COUPLERS = {
+    'I/P':  50,   # Manuel I (Grand Orgue) -> Pedale
+    'II/P': 51,   # Manuel II (Recit) -> Pedale
+    'II/I': 52,   # Manuel II (Recit) -> Manuel I (Grand Orgue)
+}
+
+# Pedales d'expression (controleurs continus, canal 16)
+# Value 0 = ferme, 127 = completement ouvert
+CC_ENCLOSURES = {
+    'left':  60,   # pedale gauche
+    'right': 61,   # pedale droite
+}
+
 
 class Stops:
     """Gestionnaire de tirants (jeux) pour l'orgue virtuel."""
