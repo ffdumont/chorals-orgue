@@ -92,11 +92,11 @@ flowchart LR
     S["Script Python"]
     S -->|"canal 1<br/>Note On/Off"| PED["Clavier Pédale"]
     S -->|"canal 2<br/>Note On/Off"| GO["Clavier Grand Orgue"]
-    S -->|"canal 16<br/>Control Change 127"| JX{{"Jeux (tirants)"}}
-    JX -->|"CC 20–26"| JGO["7 jeux Grand Orgue<br/>Bourdon 16, Flûte h. 8, Bourdon 8,<br/>Prestant 4, Quinte 2 2/3, Doublette 2, Tierce"]
-    JX -->|"CC 27–30"| JREC["4 jeux Récit<br/>Flûte 8, Flûte 4,<br/>Plein-jeu III, Trompette 8"]
+    S -->|"canal 16<br/>Control Change 127"| JX["Jeux (tirants)"]
+    JX -->|"CC 20-26"| JGO["7 jeux Grand Orgue<br/>Bourdon 16, Flûte h. 8, Bourdon 8,<br/>Prestant 4, Quinte 2 2/3, Doublette 2, Tierce"]
+    JX -->|"CC 27-30"| JREC["4 jeux Récit<br/>Flûte 8, Flûte 4,<br/>Plein-jeu III, Trompette 8"]
     JX -->|"CC 31"| TREM["Tremblant (global)"]
-    JX -->|"CC 40–44"| JPED["5 jeux Pédale<br/>Soubasse 16, Flûte 8,<br/>Bourdon 8, Flûte 4, Flûte 2"]
+    JX -->|"CC 40-44"| JPED["5 jeux Pédale<br/>Soubasse 16, Flûte 8,<br/>Bourdon 8, Flûte 4, Flûte 2"]
 ```
 
 ### Claviers (Note On / Note Off)
