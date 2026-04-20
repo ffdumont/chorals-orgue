@@ -85,7 +85,18 @@
           osmd.cursor.show();
           forceCursorImgSize(osmdDiv);
           fitHeights(block, osmdDiv);
-          statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
+
+          // Compte les steps reels du curseur OSMD pour aligner notre
+          // timemap dessus. Si MuseScore a plus ou moins de "beat
+          // positions" dans le MusicXML que nos onsets MIDI, la sync
+          // derive : on resample notre timemap sur la bonne longueur.
+          var osmdSteps = countCursorSteps(osmd);
+          var origLen = state.timemap.length;
+          if (osmdSteps > 0 && osmdSteps !== origLen) {
+            state.timemap = resampleTimemap(state.timemap, osmdSteps);
+          }
+          statusEl.textContent =
+            "Partition OK (MIDI=" + origLen + " / OSMD=" + osmdSteps + " steps).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
@@ -123,6 +134,43 @@
         },
       },
     });
+  }
+
+  // Parcourt le curseur OSMD d'un bout a l'autre pour compter les
+  // positions ("steps"). Restaure le curseur au debut a la fin.
+  function countCursorSteps(osmd) {
+    try {
+      osmd.cursor.reset();
+      var n = 0;
+      var guard = 0;
+      while (!osmd.cursor.iterator.EndReached && guard < 100000) {
+        osmd.cursor.next();
+        n++;
+        guard++;
+      }
+      osmd.cursor.reset();
+      return n;
+    } catch (e) {
+      console.error("countCursorSteps failed:", e);
+      return 0;
+    }
+  }
+
+  // Resample un tableau de temps (sec) a une longueur cible via
+  // interpolation lineaire. Preserve la forme (debut/fin/intermediaires)
+  // mais lisse les variations rythmiques fines.
+  function resampleTimemap(src, targetLen) {
+    if (targetLen <= 1 || src.length < 2) return src.slice(0, targetLen);
+    var out = new Array(targetLen);
+    var srcMax = src.length - 1;
+    for (var i = 0; i < targetLen; i++) {
+      var pos = (i / (targetLen - 1)) * srcMax;
+      var lo = Math.floor(pos);
+      var hi = Math.min(lo + 1, srcMax);
+      var frac = pos - lo;
+      out[i] = src[lo] * (1 - frac) + src[hi] * frac;
+    }
+    return out;
   }
 
   // OSMD draws the cursor as a small <img> (typically 30x1 px canvas)
