@@ -8,6 +8,7 @@
   var pendingForYt = [];
   var ytApiReady = false;
 
+  // Unique global callback for the YouTube iframe API
   window.onYouTubeIframeAPIReady = function () {
     ytApiReady = true;
     pendingForYt.splice(0).forEach(initYtPlayer);
@@ -25,6 +26,7 @@
     var midiKey = block.dataset.midiKey;
     var scoresBase = block.dataset.scoresBase || "/assets/scores/";
     var osmdDiv = block.querySelector(".osmd-host");
+    var playerIframe = block.querySelector(".sync-player");
     var offsetInput = block.querySelector(".offset-input");
     var cursorCheckbox = block.querySelector(".cursor-checkbox");
     var statusEl = block.querySelector(".status");
@@ -69,11 +71,7 @@
         return osmd.load(xml).then(function () {
           osmd.render();
           osmd.cursor.show();
-          fitHeights(block, osmdDiv);
-
-          var scoreWrap = block.querySelector(".score-wrap");
-          if (scoreWrap) scoreWrap.scrollLeft = 0;
-
+          fitScoreHeight(block, osmdDiv);
           statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
@@ -114,19 +112,18 @@
     });
   }
 
-  // Fit the score-wrap to the actually-rendered SVG height. The video-wrap
-  // is aligned to the same height; its 16:9 aspect ratio drives its width.
-  function fitHeights(block, osmdDiv) {
-    var scoreWrap = block.querySelector(".score-wrap");
-    var videoWrap = block.querySelector(".video-wrap");
-    if (!scoreWrap) return;
+  // Shrink the score wrapper to fit the actually-rendered SVG content so
+  // short examples (4 onsets on 2 staves) do not show a tall empty grey
+  // panel. Capped at ~65% of viewport height for long pieces like BWV 572.
+  function fitScoreHeight(block, osmdDiv) {
+    var wrap = block.querySelector(".score-wrap");
+    if (!wrap) return;
     var svg = osmdDiv.querySelector("svg");
     var contentH = svg ? svg.getBoundingClientRect().height : osmdDiv.scrollHeight;
-    var minH = 260;
-    var maxH = Math.min(window.innerHeight * 0.6, 520);
+    var minH = 160;
+    var maxH = Math.min(window.innerHeight * 0.65, 640);
     var target = Math.max(minH, Math.min(contentH + 16, maxH));
-    scoreWrap.style.height = target + "px";
-    if (videoWrap) videoWrap.style.height = target + "px";
+    wrap.style.height = target + "px";
   }
 
   function resetCursorTo(state, t) {
@@ -146,6 +143,7 @@
     var offset = parseFloat(state.offsetInput.value) || 0;
     var t = state.ytPlayer.getCurrentTime() - offset;
 
+    // Scrub backward -> rewind cursor from scratch
     if (state.cursorStep > 0 && state.timemap[state.cursorStep - 1] > t + 0.25) {
       resetCursorTo(state, t);
     } else {
@@ -154,7 +152,6 @@
         state.cursorStep++;
       }
     }
-
     requestAnimationFrame(function () { syncLoop(state); });
   }
 

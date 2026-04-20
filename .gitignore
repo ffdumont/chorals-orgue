@@ -19,6 +19,3 @@ assets/video/
 # Python
 __pycache__/
 
-# Prototypes (dev-only, non publies)
-proto/
-

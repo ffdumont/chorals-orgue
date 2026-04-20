@@ -6,22 +6,12 @@
   margin: 1em 0 2em 0;
 }
 
-/* Video left, score right, heights aligned to one single horizontal staff
-   system. The score height is set by JS after OSMD renders (fitHeights),
-   and the video-wrap height is set to the same value. Video width derives
-   from its 16/9 aspect-ratio. */
-.sync-block .sync-layout {
-  display: flex;
-  gap: 1em;
-  align-items: flex-start;
-}
-
 .sync-block .video-wrap {
   position: relative;
+  width: 100%;
+  max-width: 720px;
   aspect-ratio: 16 / 9;
-  flex-shrink: 0;
-  /* Initial height before JS runs; overridden to match score height. */
-  height: 240px;
+  margin: 0 auto;
 }
 .sync-block .video-wrap iframe {
   position: absolute;
@@ -32,27 +22,16 @@
 }
 
 .sync-block .score-wrap {
-  flex: 1 1 auto;
-  min-width: 0;
+  margin-top: 1em;
   border: 1px solid #ddd;
   background: #fafafa;
   /* Initial height while partition loads; JS overrides it to fit the
-     actually-rendered SVG (see fitHeights in sync_video.js). */
+     actually-rendered SVG (see fitScoreHeight in sync_video.js). */
   height: 240px;
   overflow-x: auto;
-  /* overflow-y: visible permet au curseur (dont la hauteur depasse
-     parfois celle des portees) de rester visible; on laisse scroll pour
-     couvrir les cas ou le contenu depasse tout de meme. */
   overflow-y: auto;
 }
-.sync-block .osmd-host { height: 100%; position: relative; }
-
-@media (max-width: 900px) {
-  /* On narrow screens, stack: video on top, score below */
-  .sync-block .sync-layout { flex-direction: column; }
-  .sync-block .video-wrap { width: 100%; height: auto; }
-  .sync-block .score-wrap { width: 100%; }
-}
+.sync-block .osmd-host { height: 100%; }
 
 .sync-block .sync-controls {
   margin: 0.5em 0 0 0;
