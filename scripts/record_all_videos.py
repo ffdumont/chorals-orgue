@@ -154,6 +154,17 @@ if __name__ == '__main__':
     print('Aucun son parasite pendant l\'enregistrement.')
     time.sleep(2)
 
+    # Warmup : sans cela, le tout premier chord de la premiere capture
+    # peut tomber avant que le moteur audio de GrandOrgue soit actif
+    # (cold start ASIO/WASAPI). On joue une note courte et on la retire.
+    print('Warmup GrandOrgue audio engine...')
+    cc('GO_flute8')       # pull
+    time.sleep(0.3)
+    non(1, 60); time.sleep(0.6); nof(1, 60)  # C4 bref
+    time.sleep(0.3)
+    cc('GO_flute8')       # release
+    time.sleep(0.5)
+
     SAP = ['GO_flute8', 'GO_bourdon8', 'PED_soubasse']
 
     examples = [
