@@ -5,11 +5,11 @@
     <encoding>
       <software>MuseScore Studio 4.6.5</software>
       <encoding-date>2026-04-20</encoding-date>
-      <supports element="accidental" type="yes"/>
-      <supports element="beam" type="yes"/>
-      <supports element="print" attribute="new-page" type="yes" value="yes"/>
-      <supports element="print" attribute="new-system" type="yes" value="yes"/>
-      <supports element="stem" type="yes"/>
+      <supports element="accidental" type="yes" />
+      <supports element="beam" type="yes" />
+      <supports element="print" attribute="new-page" type="yes" value="yes" />
+      <supports element="print" attribute="new-system" type="yes" value="yes" />
+      <supports element="stem" type="yes" />
       </encoding>
     <miscellaneous>
       <miscellaneous-field name="creationDate">2026-04-20</miscellaneous-field>
@@ -61,9 +61,9 @@
       <note-size type="grace">70</note-size>
       <note-size type="grace-cue">49</note-size>
       </appearance>
-    <music-font font-family="Leland"/>
-    <word-font font-family="Edwin" font-size="10"/>
-    <lyric-font font-family="Edwin" font-size="10"/>
+    <music-font font-family="Leland" />
+    <word-font font-family="Edwin" font-size="10" />
+    <lyric-font font-family="Edwin" font-size="10" />
     </defaults>
   <part-list>
     <score-part id="P1">
@@ -73,7 +73,7 @@
         <instrument-name>Piano</instrument-name>
         <instrument-sound>keyboard.piano</instrument-sound>
         </score-instrument>
-      <midi-device id="P1-I1" port="1"></midi-device>
+      <midi-device id="P1-I1" port="1" />
       <midi-instrument id="P1-I1">
         <midi-channel>2</midi-channel>
         <midi-program>1</midi-program>
@@ -88,7 +88,7 @@
         <instrument-name>Piano</instrument-name>
         <instrument-sound>keyboard.piano</instrument-sound>
         </score-instrument>
-      <midi-device id="P2-I1" port="1"></midi-device>
+      <midi-device id="P2-I1" port="1" />
       <midi-instrument id="P2-I1">
         <midi-channel>1</midi-channel>
         <midi-program>1</midi-program>
@@ -138,7 +138,7 @@
             </metronome>
           </direction-type>
         <staff>1</staff>
-        <sound tempo="40"/>
+        <sound tempo="40" />
         </direction>
       <note default-x="98.59" default-y="-15" dynamics="88.89">
         <pitch>
@@ -603,7 +603,7 @@
           </staff-layout>
         </print>
       <note default-x="118.73" default-y="-10">
-        <rest measure="yes"/>
+        <rest measure="yes" />
         <duration>8</duration>
         <voice>1</voice>
         <staff>1</staff>
@@ -612,7 +612,7 @@
         <duration>8</duration>
         </backup>
       <note default-x="118.73" default-y="-115">
-        <rest measure="yes"/>
+        <rest measure="yes" />
         <duration>8</duration>
         <voice>5</voice>
         <staff>2</staff>
@@ -654,7 +654,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="3.44"/>
+            <staccato default-x="4.93" default-y="3.44" />
             </articulations>
           </notations>
         </note>
@@ -669,7 +669,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="3.44"/>
+            <staccato default-x="4.93" default-y="3.44" />
             </articulations>
           </notations>
         </note>
@@ -684,7 +684,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-6.56"/>
+            <staccato default-x="4.93" default-y="-6.56" />
             </articulations>
           </notations>
         </note>
@@ -699,7 +699,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="3.44"/>
+            <staccato default-x="4.93" default-y="3.44" />
             </articulations>
           </notations>
         </note>
@@ -717,7 +717,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-43.44"/>
+            <staccato default-x="4.93" default-y="-43.44" />
             </articulations>
           </notations>
         </note>
@@ -733,7 +733,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-43.44"/>
+            <staccato default-x="4.93" default-y="-43.44" />
             </articulations>
           </notations>
         </note>
@@ -748,7 +748,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-44.3"/>
+            <staccato default-x="4.93" default-y="-44.3" />
             </articulations>
           </notations>
         </note>
@@ -764,7 +764,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-43.44"/>
+            <staccato default-x="4.93" default-y="-43.44" />
             </articulations>
           </notations>
         </note>
@@ -781,7 +781,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-33.44"/>
+            <staccato default-x="4.93" default-y="-33.44" />
             </articulations>
           </notations>
         </note>
@@ -796,7 +796,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-33.44"/>
+            <staccato default-x="4.93" default-y="-33.44" />
             </articulations>
           </notations>
         </note>
@@ -812,7 +812,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-43.44"/>
+            <staccato default-x="4.93" default-y="-43.44" />
             </articulations>
           </notations>
         </note>
@@ -827,7 +827,7 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-33.44"/>
+            <staccato default-x="4.93" default-y="-33.44" />
             </articulations>
           </notations>
         </note>
@@ -844,7 +844,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="3.44"/>
+            <staccato default-x="4.93" default-y="3.44" />
             </articulations>
           </notations>
         </note>
@@ -859,7 +859,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="-6.56"/>
+            <staccato default-x="4.93" default-y="-6.56" />
             </articulations>
           </notations>
         </note>
@@ -874,7 +874,7 @@
         <stem>down</stem>
         <notations>
           <articulations>
-            <staccato default-x="4.93" default-y="3.44"/>
+            <staccato default-x="4.93" default-y="3.44" />
             </articulations>
           </notations>
         </note>
@@ -884,12 +884,12 @@
           <octave>3</octave>
           </pitch>
         <duration>2</duration>
-        <tie type="start"/>
+        <tie type="start" />
         <voice>1</voice>
         <type>quarter</type>
         <stem>down</stem>
         <notations>
-          <tied type="start"/>
+          <tied type="start" />
           </notations>
         </note>
       </measure>
@@ -905,22 +905,22 @@
           <octave>3</octave>
           </pitch>
         <duration>2</duration>
-        <tie type="stop"/>
+        <tie type="stop" />
         <voice>1</voice>
         <type>quarter</type>
         <stem>down</stem>
         <notations>
-          <tied type="stop"/>
+          <tied type="stop" />
           </notations>
         </note>
       <note default-x="111.47" default-y="-270.68">
-        <rest/>
+        <rest />
         <duration>2</duration>
         <voice>1</voice>
         <type>quarter</type>
         </note>
       <note default-x="146.48" default-y="-270.68">
-        <rest/>
+        <rest />
         <duration>4</duration>
         <voice>1</voice>
         <type>half</type>

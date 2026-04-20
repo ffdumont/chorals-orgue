@@ -15,8 +15,10 @@ Usage:
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import mido
@@ -63,6 +65,93 @@ def render_musicxml(midi_path: Path, out_path: Path) -> None:
     )
 
 
+def consolidate_musicxml(xml_path: Path) -> tuple[int, int]:
+    """Strip empty staves produced by MuseScore's MIDI import.
+
+    MuseScore imports each MIDI track as a Piano part with a full grand staff
+    (treble + bass). When a track only plays in one hand, the other staff is
+    full of rests, making the rendered score twice as tall as needed.
+
+    This pass:
+      - Removes <part> elements whose notes are all rests.
+      - For each remaining 2-staff part that only has pitched notes on one
+        staff, drops the other staff (clef, <staff> markers, and
+        other-staff notes/rests). <backup>/<forward> inside such parts are
+        stripped (they serve only the multi-staff layout).
+
+    Returns (parts_dropped, staves_collapsed).
+    """
+    # Preserve the DOCTYPE / encoding prologue (ElementTree drops them on
+    # serialization). We'll concat them back.
+    raw = xml_path.read_text(encoding="utf-8")
+    m = re.search(r"<score-partwise\b", raw)
+    header = raw[: m.start()] if m else '<?xml version="1.0" encoding="UTF-8"?>\n'
+
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    part_list = root.find("part-list")
+
+    parts_dropped = 0
+    staves_collapsed = 0
+
+    for part in list(root.findall("part")):
+        part_id = part.get("id")
+
+        # Collect staves that actually contain pitched notes
+        active_staves: set[int] = set()
+        for note in part.iter("note"):
+            if note.find("pitch") is None:
+                continue
+            staff_el = note.find("staff")
+            active_staves.add(int(staff_el.text) if staff_el is not None else 1)
+
+        if not active_staves:
+            # Entirely silent part: drop it and its part-list entry
+            root.remove(part)
+            if part_list is not None:
+                for sp in part_list.findall("score-part"):
+                    if sp.get("id") == part_id:
+                        part_list.remove(sp)
+                        break
+            parts_dropped += 1
+            continue
+
+        if len(active_staves) >= 2:
+            continue  # grand staff genuinely needed
+
+        keep = next(iter(active_staves))
+        staves_collapsed += 1
+
+        for measure in part.findall("measure"):
+            for attrs in measure.findall("attributes"):
+                staves_el = attrs.find("staves")
+                if staves_el is not None:
+                    attrs.remove(staves_el)
+                for clef in list(attrs.findall("clef")):
+                    n = clef.get("number")
+                    if n and int(n) != keep:
+                        attrs.remove(clef)
+                for clef in attrs.findall("clef"):
+                    clef.attrib.pop("number", None)
+
+            for child in list(measure):
+                if child.tag == "note":
+                    staff_el = child.find("staff")
+                    staff_num = int(staff_el.text) if staff_el is not None else 1
+                    if staff_num != keep:
+                        measure.remove(child)
+                    elif staff_el is not None:
+                        child.remove(staff_el)
+                elif child.tag in ("backup", "forward"):
+                    measure.remove(child)
+
+    # Serialize without XML declaration (we'll prepend the original header)
+    body = ET.tostring(root, encoding="unicode")
+    xml_path.write_text(header + body, encoding="utf-8")
+
+    return parts_dropped, staves_collapsed
+
+
 def build_one(key: str) -> tuple[int, float]:
     midi_path = MIDI_DIR / f"{key}.mid"
     if not midi_path.exists():
@@ -72,11 +161,12 @@ def build_one(key: str) -> tuple[int, float]:
     map_path = SCORES_DIR / f"{key}.timemap.json"
 
     render_musicxml(midi_path, xml_path)
+    dropped, collapsed = consolidate_musicxml(xml_path)
     onsets = extract_onsets(midi_path)
     map_path.write_text(json.dumps({"onsets": onsets}, separators=(",", ":")))
 
     duration = onsets[-1] if onsets else 0.0
-    return len(onsets), duration
+    return len(onsets), duration, dropped, collapsed
 
 
 def main(argv: list[str]) -> int:
@@ -89,8 +179,14 @@ def main(argv: list[str]) -> int:
     SCORES_DIR.mkdir(parents=True, exist_ok=True)
     print(f"Output dir: {SCORES_DIR}")
     for key in keys:
-        n, dur = build_one(key)
-        print(f"  {key:30s}  {n:5d} onsets  {dur:7.2f}s")
+        n, dur, dropped, collapsed = build_one(key)
+        extras = []
+        if dropped:
+            extras.append(f"{dropped} empty part(s) dropped")
+        if collapsed:
+            extras.append(f"{collapsed} stave(s) collapsed")
+        extra_str = f"  [{', '.join(extras)}]" if extras else ""
+        print(f"  {key:30s}  {n:5d} onsets  {dur:7.2f}s{extra_str}")
     return 0
 
 
