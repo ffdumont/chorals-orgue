@@ -7,7 +7,7 @@ permalink: /projet/
 
 # Apprendre l'orgue autrement
 
-Ce wiki accompagne un chemin personnel : reprendre l'orgue à l'âge adulte, sans professeur régulier, avec pour horizon lointain les chorals de Bach. Deux particularités à signaler d'emblée : l'instrument est **virtuel** — un orgue restitué par ordinateur à partir d'échantillons d'un véritable instrument — et l'étude s'appuie sur quelques **outils d'analyse** qui permettent de prendre du recul sur ce qu'on joue réellement.
+Ce wiki accompagne un chemin personnel : reprendre l'orgue à l'âge adulte, sans professeur régulier, avec pour horizon lointain quelques chorals simples. Deux particularités à signaler d'emblée : l'instrument est **virtuel** — un orgue restitué par ordinateur à partir d'échantillons d'un véritable instrument — et l'étude s'appuie sur quelques **outils d'analyse** qui permettent de prendre du recul sur ce qu'on joue réellement.
 
 Rien ici ne prétend se substituer à l'enseignement classique de l'orgue. La démarche s'y ajoute, en tâchant d'en respecter l'esprit.
 
@@ -37,7 +37,7 @@ L'orgue virtuel reçoit par MIDI exactement ce que joue le clavier. On peut donc
 
 ## Répertoire de départ
 
-Les chorals de Bach restent l'horizon. Avant eux, un répertoire qu'il convient d'aborder patiemment : Peeters, *Ars Organi* (méthode explicitement conçue pour adultes débutant l'orgue) ; Dupré, *79 Chorals* ; les *Acht kleine Präludien und Fugen* BWV 553–560, longtemps attribués à Bach ; Pachelbel ; versets de Couperin ; petits chorals à deux voix de l'*Orgelbüchlein*. Sans pédalier pour l'instant, on se tourne naturellement vers le répertoire *manualiter*, plus vaste qu'on ne l'imagine.
+Quelques chorals simples restent l'horizon — on n'en demande pas davantage. Pour y parvenir, un répertoire qu'il convient d'aborder patiemment : Peeters, *Ars Organi* (méthode explicitement conçue pour adultes débutant l'orgue) ; Dupré, *79 Chorals* ; les *Acht kleine Präludien und Fugen* BWV 553–560, longtemps attribués à Bach ; Pachelbel ; versets de Couperin ; petits chorals à deux voix de l'*Orgelbüchlein*. Sans pédalier pour l'instant, on se tourne naturellement vers le répertoire *manualiter*, plus vaste qu'on ne l'imagine.
 
 ## L'angle mort, assumé
 
