@@ -67,6 +67,13 @@
           pageFormat: "Endless",
           drawingParameters: "compact",
           renderSingleHorizontalStaffline: true,
+          // Bright, thick cursor so it remains visible on dense scores
+          cursorsOptions: [{
+            color: "#e60026",
+            alpha: 0.45,
+            type: 0,
+            follow: true,
+          }],
         });
         // Force single-line rendering (no wrap to new systems). Passing the
         // option to the constructor is not always honored depending on OSMD
@@ -78,7 +85,12 @@
         return osmd.load(xml).then(function () {
           osmd.render();
           osmd.cursor.show();
+          osmd.cursor.reset();
           fitScoreHeight(block, osmdDiv);
+          // Ensure the start of the score is visible initially (before
+          // the video starts, followCursor has nothing to scroll to yet).
+          var scoreWrap = block.querySelector(".score-wrap");
+          if (scoreWrap) scoreWrap.scrollLeft = 0;
           statusEl.textContent = "Partition OK (" + state.timemap.length + " onsets).";
 
           if (cursorCheckbox) {
