@@ -4,7 +4,10 @@ author: ffdumont
 baseurl: "/chorals-orgue"
 url: "https://ffdumont.github.io"
 
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
 
 # Just the Docs settings
 color_scheme: light
