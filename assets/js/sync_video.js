@@ -130,21 +130,37 @@
     }
   }
 
-  // Aligne les hauteurs partition ET video sur la hauteur rendue du
-  // premier systeme OSMD. La largeur de la video decoule de son
-  // aspect-ratio 16:9. Plancher 260px pour garder la video regardable
-  // meme sur les petites partitions, plafond 60vh / 520px.
+  // Calcule la hauteur partition/video a partir de la largeur du
+  // conteneur flex (et non du SVG OSMD). La video prend ~50% du
+  // conteneur en largeur, sa hauteur suit le ratio 16:9 ; la partition
+  // est calee sur la meme hauteur. Si on se basait sur la hauteur du
+  // SVG, la video devenait trop large et faisait deborder le flex.
   function fitHeights(block, osmdDiv) {
     var scoreWrap = block.querySelector(".score-wrap");
     var videoWrap = block.querySelector(".video-wrap");
-    if (!scoreWrap) return;
-    var svg = osmdDiv.querySelector("svg");
-    var contentH = svg ? svg.getBoundingClientRect().height : osmdDiv.scrollHeight;
-    var minH = 260;
-    var maxH = Math.min(window.innerHeight * 0.6, 520);
-    var target = Math.max(minH, Math.min(contentH + 16, maxH));
-    scoreWrap.style.height = target + "px";
-    if (videoWrap) videoWrap.style.height = target + "px";
+    var layout = block.querySelector(".sync-layout");
+    if (!scoreWrap || !videoWrap || !layout) return;
+
+    // Mobile (flex-direction: column via media query) : ne touche pas a
+    // la largeur, fixe une hauteur plus grande pour la partition.
+    if (getComputedStyle(layout).flexDirection === "column") {
+      scoreWrap.style.height = "48vh";
+      videoWrap.style.height = "";
+      videoWrap.style.width = "";
+      return;
+    }
+
+    var gap = 16;  // cf. CSS .sync-layout { gap: 1em }
+    var layoutW = layout.clientWidth;
+    var videoW = Math.max(240, (layoutW - gap) / 2);
+    var videoH = videoW * 9 / 16;
+    // Bornes : ni trop petit, ni plus grand que ~55vh pour rester lisible
+    videoH = Math.max(180, Math.min(videoH, window.innerHeight * 0.55, 440));
+    videoW = videoH * 16 / 9;
+
+    videoWrap.style.width = videoW + "px";
+    videoWrap.style.height = videoH + "px";
+    scoreWrap.style.height = videoH + "px";
   }
 
   function resetCursorTo(state, t) {

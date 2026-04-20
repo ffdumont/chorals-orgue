@@ -18,9 +18,12 @@
 
 .sync-block .video-wrap {
   position: relative;
-  aspect-ratio: 16 / 9;
   flex-shrink: 0;
-  /* Hauteur initiale avant que JS la recale sur la partition. */
+  /* Dimensions initiales avant que fitHeights les recalcule depuis la
+     largeur du conteneur. JS fixe width ET height explicitement pour
+     eviter que le ratio 16:9 CSS fasse deborder le flex quand la
+     partition est tres haute. */
+  width: 426px;
   height: 240px;
 }
 .sync-block .video-wrap iframe {
