@@ -17,14 +17,19 @@ import random
 import time
 
 from record_video import VideoRecorder
-from stops_control import Stops
+from stops_control import (Stops, CC_STOPS, CC_COUPLERS, STOPS_CHANNEL,
+                            PRESETS, PRESET_COUPLERS)
 
 OUT_DIR = r'D:/Projects/chorals-orgue/assets/video'
 os.makedirs(OUT_DIR, exist_ok=True)
 
+# Alias pour les noms courts utilises dans ce script (compat historique)
 CC = {
-    'GO_bourdon8': 22, 'GO_flute8': 21, 'GO_prestant4': 23,
-    'PED_soubasse': 40, 'PED_bourdon8': 42,
+    'GO_bourdon8': CC_STOPS['GO_bourdon8'],
+    'GO_flute8':   CC_STOPS['GO_flute_harmonique8'],
+    'GO_prestant4': CC_STOPS['GO_prestant4'],
+    'PED_soubasse': CC_STOPS['PED_soubasse16'],
+    'PED_bourdon8': CC_STOPS['PED_bourdon8'],
 }
 
 # ============ MIDI playback ============
@@ -32,7 +37,16 @@ CC = {
 out = mido.open_output('loopMIDI Port 1')
 
 def cc(name):
-    out.send(mido.Message('control_change', channel=15, control=CC[name], value=127))
+    # Accepte soit un alias de CC (ci-dessus), soit un nom direct de CC_STOPS
+    num = CC.get(name) or CC_STOPS.get(name)
+    if num is None:
+        raise ValueError(f'CC inconnu : {name}')
+    out.send(mido.Message('control_change', channel=STOPS_CHANNEL, control=num, value=127))
+    time.sleep(0.05)
+
+def coupler(name):
+    num = CC_COUPLERS[name]
+    out.send(mido.Message('control_change', channel=STOPS_CHANNEL, control=num, value=127))
     time.sleep(0.05)
 
 def non(ch, n, v=80):
@@ -62,16 +76,18 @@ def chord3_sap(s, a, bass, dur):
     nof(1, s)
     time.sleep(dur * 0.08)
 
-def record_example(name, play_fn, stops_on, stops_off_after=None):
+def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=()):
     if stops_off_after is None:
         stops_off_after = stops_on
 
     print(f'\n=== {name} ===')
     rec = VideoRecorder()
 
-    # Pull stops AVANT le start du record pour ne pas filmer le clic
+    # Pull stops + couplers AVANT le start du record pour ne pas filmer le clic
     for s in stops_on:
         cc(s)
+    for c in couplers_on:
+        coupler(c)
     time.sleep(0.5)
 
     rec.start()
@@ -83,7 +99,9 @@ def record_example(name, play_fn, stops_on, stops_off_after=None):
     mp4 = os.path.join(OUT_DIR, f'{name}.mp4')
     rec.stop_and_save_mp4(mp4)
 
-    # Retirer les jeux
+    # Retirer les jeux et accouplements
+    for c in couplers_on:
+        coupler(c)
     for s in stops_off_after:
         cc(s)
     time.sleep(0.3)
@@ -145,6 +163,12 @@ def play_bwv639():
         if not msg.is_meta:
             out.send(msg)
 
+def play_bwv572_gravement():
+    mid = mido.MidiFile(r'D:/Projects/chorals-orgue/assets/midi/bwv572_gravement.mid')
+    for msg in mid.play():
+        if not msg.is_meta:
+            out.send(msg)
+
 # ============ Run ============
 
 if __name__ == '__main__':
@@ -174,12 +198,15 @@ if __name__ == '__main__':
 
     SAP = ['GO_flute8', 'GO_bourdon8', 'PED_soubasse']
 
+    # (name, play_fn, stops, couplers)
     examples = [
-        ('exemple1', play_example1, SAP),
-        ('exemple2', play_example2, SAP),
-        ('exemple3', play_example3, SAP),
-        ('exemple4', play_example4, SAP),
-        ('bwv639',   play_bwv639,   SAP + ['PED_bourdon8']),
+        ('exemple1', play_example1, SAP, ()),
+        ('exemple2', play_example2, SAP, ()),
+        ('exemple3', play_example3, SAP, ()),
+        ('exemple4', play_example4, SAP, ()),
+        ('bwv639',   play_bwv639,   SAP + ['PED_bourdon8'], ()),
+        ('bwv572_gravement', play_bwv572_gravement,
+         PRESETS['grand_plein_jeu'], PRESET_COUPLERS['grand_plein_jeu']),
     ]
 
     if only:
@@ -188,8 +215,8 @@ if __name__ == '__main__':
             print(f'Aucune piste ne correspond : {only}')
             sys.exit(1)
 
-    for name, fn, stops in examples:
-        record_example(name, fn, stops)
+    for name, fn, stops, couplers in examples:
+        record_example(name, fn, stops, couplers_on=couplers)
 
     out.close()
     print(f'\n=== TERMINE === Fichiers dans : {OUT_DIR}')

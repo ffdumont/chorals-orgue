@@ -18,6 +18,7 @@ Chaque page propose :
 ## Pièces
 
 - **[Bach — BWV 639 "Ich ruf zu dir, Herr Jesu Christ"](/chorals-orgue/pieces/bwv639/)** — une approche pédagogique en quatre étapes progressives pour décortiquer la mécanique du prélude de choral.
+- **[Bach — BWV 572 "Pièce d'orgue" (Gravement)](/chorals-orgue/pieces/bwv572/)** — une démo sonore du grand plein-jeu de l'orgue de Saint-Jean-de-Luz : 14 jeux tirés, section centrale de la *Fantaisie en Sol majeur*.
 
 ## Sous le capot
 

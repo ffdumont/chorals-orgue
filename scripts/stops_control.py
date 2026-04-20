@@ -138,4 +138,20 @@ PRESETS = {
     'plein_jeu': ['GO_bourdon8', 'GO_prestant4', 'GO_doublette',
                   'GO_quinte', 'GO_tierce',
                   'PED_soubasse16', 'PED_bourdon8', 'PED_flute4'],
+    # Grand plein-jeu : 15/17 jeux (88%) — pour Bach BWV 572 Gravement
+    # Doit etre accompagne des accouplements II/I et I/P
+    'grand_plein_jeu': [
+        # Grand Orgue : tous les fonds + mutations
+        'GO_bourdon16', 'GO_flute_harmonique8', 'GO_bourdon8',
+        'GO_prestant4', 'GO_quinte', 'GO_doublette', 'GO_tierce',
+        # Recit : fonds + plein-jeu + trompette pour l'eclat (accouple via II/I)
+        'REC_flute8', 'REC_flute4', 'REC_plein_jeu', 'REC_trompette',
+        # Pedale : fonds gravite 16-8-8-4 (tirasse GO via I/P)
+        'PED_soubasse16', 'PED_flute8', 'PED_bourdon8', 'PED_flute4',
+    ],
+}
+
+# Accouplements associes a certains presets
+PRESET_COUPLERS = {
+    'grand_plein_jeu': ['II/I', 'I/P'],
 }

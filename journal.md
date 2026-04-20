@@ -11,6 +11,12 @@ Cette page recense les ajouts et modifications notables apportés au wiki : nouv
 
 ## 2026-04-20
 
+### Page [BWV 572 — Pièce d'orgue (Gravement)](/chorals-orgue/pieces/bwv572/)
+
+- Ajout d'une démo "grand plein-jeu" avec 15 des 17 jeux de l'orgue de Saint-Jean-de-Luz (88 %) : tous les jeux du Grand Orgue et du Récit (y compris la Trompette 8 pour plus d'éclat), fonds de Pédale, avec accouplements II/I et I/P.
+- Section *Gravement* extraite automatiquement du MIDI complet (séquence Dean Lampe, Kunst der Fuge) par détection de frontière entre les sections (changement de mesure 12/8 → 4/4 et densité de notes).
+- Nouveau preset `grand_plein_jeu` dans [scripts/stops_control.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/stops_control.py) avec accouplements associés via `PRESET_COUPLERS`. Extension de [scripts/play_midi.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/play_midi.py) et [scripts/record_all_videos.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/record_all_videos.py) pour gérer les accouplements dans un preset.
+
 ### Bascule MP3 → vidéos YouTube
 
 - Remplacement des lecteurs audio MP3 par des vidéos YouTube (non-répertoriées) embarquées en iframe : on voit désormais la console GrandOrgue avec les jeux tirés et les touches qui bougent pendant l'écoute.
