@@ -69,7 +69,19 @@
         });
         state.osmd = osmd;
         return osmd.load(xml).then(function () {
+          // Force OSMD a rendre sur UNE seule ligne horizontale : on
+          // elargit temporairement osmd-host a 20000px avant render, ce
+          // qui donne a OSMD une largeur de page virtuellement infinie
+          // et l'empeche de replier sur plusieurs systemes. Ensuite on
+          // recale la largeur sur celle du SVG reellement rendu.
+          osmdDiv.style.width = "20000px";
           osmd.render();
+          var svg = osmdDiv.querySelector("svg");
+          if (svg) {
+            osmdDiv.style.width = Math.ceil(svg.getBoundingClientRect().width) + "px";
+          } else {
+            osmdDiv.style.width = "";
+          }
           osmd.cursor.show();
           forceCursorImgSize(osmdDiv);
           fitHeights(block, osmdDiv);
@@ -130,11 +142,10 @@
     }
   }
 
-  // Calcule la hauteur partition/video a partir de la largeur du
-  // conteneur flex (et non du SVG OSMD). La video prend ~50% du
-  // conteneur en largeur, sa hauteur suit le ratio 16:9 ; la partition
-  // est calee sur la meme hauteur. Si on se basait sur la hauteur du
-  // SVG, la video devenait trop large et faisait deborder le flex.
+  // La hauteur de la partition = hauteur d'UN systeme complet
+  // reellement rendu par OSMD (forcee en ligne unique via wide container
+  // dans initBlock). La video est calee sur cette meme hauteur ; sa
+  // largeur se deduit du ratio 16:9.
   function fitHeights(block, osmdDiv) {
     var scoreWrap = block.querySelector(".score-wrap");
     var videoWrap = block.querySelector(".video-wrap");
@@ -150,17 +161,16 @@
       return;
     }
 
-    var gap = 16;  // cf. CSS .sync-layout { gap: 1em }
-    var layoutW = layout.clientWidth;
-    var videoW = Math.max(240, (layoutW - gap) / 2);
-    var videoH = videoW * 9 / 16;
-    // Bornes : ni trop petit, ni plus grand que ~55vh pour rester lisible
-    videoH = Math.max(180, Math.min(videoH, window.innerHeight * 0.55, 440));
-    videoW = videoH * 16 / 9;
+    var svg = osmdDiv.querySelector("svg");
+    var systemH = svg ? svg.getBoundingClientRect().height : 260;
+    // Bornes : ni trop petit (video devient illisible), ni plus grand
+    // que ~55vh pour garder la suite de la page visible.
+    var target = Math.max(180, Math.min(systemH + 8, window.innerHeight * 0.55, 460));
+    var videoW = target * 16 / 9;
 
+    scoreWrap.style.height = target + "px";
+    videoWrap.style.height = target + "px";
     videoWrap.style.width = videoW + "px";
-    videoWrap.style.height = videoH + "px";
-    scoreWrap.style.height = videoH + "px";
   }
 
   function resetCursorTo(state, t) {
