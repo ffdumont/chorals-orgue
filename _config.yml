@@ -3,23 +3,25 @@ description: Partitions, enregistrements et commentaires autour du répertoire d
 author: ffdumont
 baseurl: "/chorals-orgue"
 url: "https://ffdumont.github.io"
+lang: fr
 
-remote_theme: just-the-docs/just-the-docs
+theme: minima
+
 plugins:
-  - jekyll-remote-theme
   - jekyll-seo-tag
 
-# Just the Docs settings
-color_scheme: light
-search_enabled: true
-heading_anchors: true
-mermaid:
-  version: "10.9.0"
-nav_external_links:
-  - title: GitHub
-    url: https://github.com/ffdumont/chorals-orgue
+# Ordre des liens dans la nav horizontale du header minima.
+header_pages:
+  - projet.md
+  - pieces/bwv639.md
+  - pieces/bwv572.md
+  - pieces/setup-technique.md
+  - journal.md
 
-# Giscus (commentaires) - à remplacer après activation Giscus
+minima:
+  skin: classic
+
+# Giscus (commentaires) — inclus uniquement sur les pages /pieces/
 giscus:
   repo: "ffdumont/chorals-orgue"
   repo_id: "R_kgDOSHoKxA"
@@ -28,7 +30,6 @@ giscus:
   mapping: "pathname"
   theme: "preferred_color_scheme"
 
-# Jekyll config
 markdown: kramdown
 permalink: pretty
 
@@ -40,3 +41,4 @@ exclude:
   - Gemfile.lock
   - node_modules
   - vendor
+  - proto
