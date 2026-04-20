@@ -1,0 +1,9 @@
+// Elargit la largeur maximale du contenu et de la sidebar.
+// Valeurs par defaut de just-the-docs:
+//   $content-width: 50rem (800px)
+//   $nav-width:     16.5rem (264px)
+// Sur ecrans larges, le layout par defaut laisse une grosse marge vide
+// a gauche. On pousse le contenu pour profiter de la largeur dispo.
+
+$content-width: 80rem; // 1280px
+$nav-width: 18rem;     // 288px
