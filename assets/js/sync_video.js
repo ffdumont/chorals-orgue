@@ -239,15 +239,13 @@
 
     var svg = osmdDiv.querySelector("svg");
     var systemH = svg ? svg.getBoundingClientRect().height : 260;
-    var target = Math.max(180, Math.min(systemH + 8, window.innerHeight * 0.55, 460));
 
     var layout = block.querySelector(".sync-layout");
     var videoWrap = block.querySelector(".video-wrap");
 
-    // Pas de layout flex (ex. page calibration en audio simple) :
-    // juste la hauteur partition, rien a aligner.
+    // Pas de layout flex (ex. page calibration en audio simple)
     if (!layout || !videoWrap) {
-      scoreWrap.style.height = target + "px";
+      scoreWrap.style.height = Math.max(180, Math.min(systemH + 8, window.innerHeight * 0.75, 720)) + "px";
       return;
     }
 
@@ -259,10 +257,24 @@
       return;
     }
 
-    // Desktop cote-a-cote : video calee sur la hauteur partition, ratio 16:9
-    scoreWrap.style.height = target + "px";
-    videoWrap.style.height = target + "px";
-    videoWrap.style.width = (target * 16 / 9) + "px";
+    // Desktop cote-a-cote. La video est calee sur la largeur du conteneur
+    // (~ moitie) et son ratio 16:9. La partition peut etre PLUS HAUTE que
+    // la video pour afficher toutes les portees sans troncature : on ne
+    // lie plus les deux hauteurs.
+    var gap = 16;
+    var layoutW = layout.clientWidth;
+    var videoW = Math.max(240, (layoutW - gap) / 2);
+    var videoH = videoW * 9 / 16;
+    videoH = Math.max(180, Math.min(videoH, window.innerHeight * 0.55, 440));
+    videoW = videoH * 16 / 9;
+
+    // Partition : au moins la hauteur de la video, mais peut monter pour
+    // montrer toutes les portees (cap 75vh / 720px).
+    var scoreH = Math.max(videoH, Math.min(systemH + 8, window.innerHeight * 0.75, 720));
+
+    videoWrap.style.width = videoW + "px";
+    videoWrap.style.height = videoH + "px";
+    scoreWrap.style.height = scoreH + "px";
   }
 
   // Deplace le curseur OSMD horizontalement d'apres le temps ecoule
