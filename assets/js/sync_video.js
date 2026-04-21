@@ -334,6 +334,10 @@
       }
     }
 
+    // Glisse le curseur entre onsets : evite qu'il reste fige sur les
+    // notes longues (rondes, blanches) pendant que l'audio progresse.
+    interpolateCursorX(state, t);
+
     // Panneau de debug optionnel (ex. page de calibration).
     // Affiche step courant, temps, temps attendu, derive.
     if (state.debugEl) {
