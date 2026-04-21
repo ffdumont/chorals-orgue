@@ -255,7 +255,12 @@
   function resetCursorTo(state, t) {
     state.osmd.cursor.reset();
     state.cursorStep = 0;
-    while (state.cursorStep < state.timemap.length && state.timemap[state.cursorStep] <= t) {
+    // cursorStep represente la note actuellement surlignee (pas la
+    // prochaine). On n'avance que quand t atteint l'onset SUIVANT.
+    while (
+      state.cursorStep + 1 < state.timemap.length &&
+      state.timemap[state.cursorStep + 1] <= t
+    ) {
       state.osmd.cursor.next();
       state.cursorStep++;
     }
@@ -270,10 +275,15 @@
     var t = state.player.getCurrentTime() - offset;
 
     // Scrub backward -> rewind cursor from scratch
-    if (state.cursorStep > 0 && state.timemap[state.cursorStep - 1] > t + 0.25) {
+    if (state.cursorStep > 0 && state.timemap[state.cursorStep] > t + 0.25) {
       resetCursorTo(state, t);
     } else {
-      while (state.cursorStep < state.timemap.length && state.timemap[state.cursorStep] <= t) {
+      // On n'avance QUE si l'onset suivant est atteint : le curseur
+      // reste sur la note courante tant que t < timemap[cursorStep+1].
+      while (
+        state.cursorStep + 1 < state.timemap.length &&
+        state.timemap[state.cursorStep + 1] <= t
+      ) {
         state.osmd.cursor.next();
         state.cursorStep++;
       }
