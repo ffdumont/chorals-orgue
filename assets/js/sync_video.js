@@ -63,6 +63,7 @@
         var xml = vals[0];
         var map = vals[1];
         state.timemap = map.onsets;
+        state.barlines = (map.barlines && map.barlines.length >= 2) ? map.barlines : null;
 
         var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdDiv, {
           autoResize: false,
@@ -101,12 +102,22 @@
           var walk = walkCursor(osmd, osmdDiv);
           state.osmdSteps = walk.count;
           state.cursorXs = walk.positions;
+          state.stepMeasureIndex = walk.measureIndex;
           var origLen = state.timemap.length;
-          if (state.osmdSteps > 0 && state.osmdSteps !== origLen) {
-            state.timemap = resampleTimemap(state.timemap, state.osmdSteps);
+          var mode = "linear";
+          if (state.osmdSteps > 0) {
+            if (state.barlines) {
+              state.timemap = buildMeasureAnchoredTimemap(
+                state.timemapOrig, state.barlines, walk.measureIndex
+              );
+              mode = "measures=" + (state.barlines.length - 1);
+            } else if (state.osmdSteps !== origLen) {
+              state.timemap = resampleTimemap(state.timemap, state.osmdSteps);
+            }
           }
           statusEl.textContent =
-            "Partition OK (MIDI=" + origLen + " / OSMD=" + state.osmdSteps + " steps).";
+            "Partition OK (MIDI=" + origLen + " / OSMD=" + state.osmdSteps +
+            " steps, " + mode + ").";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
@@ -166,16 +177,23 @@
   }
 
   // Parcourt le curseur OSMD d'un bout a l'autre pour compter les
-  // positions ("steps") ET pour enregistrer la position X de chaque
-  // step (via offsetLeft de l'<img> curseur). Restaure le curseur au
-  // debut a la fin.
+  // positions ("steps") ET pour enregistrer la position X + l'index
+  // de mesure de chaque step. Restaure le curseur au debut a la fin.
   function walkCursor(osmd, osmdDiv) {
     var positions = [];
+    var measureIndex = [];
+    function recordMeasure() {
+      var it = osmd.cursor && osmd.cursor.iterator;
+      var m = it && (it.CurrentMeasureIndex != null ? it.CurrentMeasureIndex
+        : (it.currentMeasureIndex != null ? it.currentMeasureIndex : null));
+      measureIndex.push(m != null ? m : (measureIndex.length ? measureIndex[measureIndex.length - 1] : 0));
+    }
     try {
       osmd.cursor.reset();
       forceCursorImgSize(osmdDiv);
       var img = osmdDiv.querySelector("img");
       if (img) positions.push(img.offsetLeft);
+      recordMeasure();
       var guard = 0;
       while (!osmd.cursor.iterator.EndReached && guard < 100000) {
         osmd.cursor.next();
@@ -185,14 +203,91 @@
         if (osmd.cursor.iterator.EndReached) break;
         img = osmdDiv.querySelector("img");
         if (img) positions.push(img.offsetLeft);
+        recordMeasure();
         guard++;
       }
       osmd.cursor.reset();
-      return { count: positions.length, positions: positions };
+      return { count: positions.length, positions: positions, measureIndex: measureIndex };
     } catch (e) {
       console.error("walkCursor failed:", e);
-      return { count: 0, positions: [] };
+      return { count: 0, positions: [], measureIndex: [] };
     }
+  }
+
+  // Construit un timemap ancre aux barres de mesure : chaque mesure
+  // OSMD est traitee independamment et ses steps sont anchorees aux
+  // onsets MIDI de la meme mesure (1:1 si les comptes correspondent,
+  // sinon resample lineaire dans le segment [barre_n, barre_n+1]).
+  // La derive possible est ainsi bornee a UNE mesure.
+  //
+  // Parametres :
+  //   onsets         : [t_note1, t_note2, ...] depuis MIDI (sec)
+  //   barlines       : [0, t_bar2, ..., t_bar_end] N+1 entrees pour N mesures
+  //   stepMeasureIdx : stepMeasureIdx[s] = index de mesure OSMD pour le step s
+  //
+  // Renvoie out[step] = temps cible (sec).
+  function buildMeasureAnchoredTimemap(onsets, barlines, stepMeasureIdx) {
+    var out = new Array(stepMeasureIdx.length);
+
+    // Groupe les steps OSMD par mesure
+    var stepsByM = {};
+    for (var s = 0; s < stepMeasureIdx.length; s++) {
+      var m = stepMeasureIdx[s];
+      if (stepsByM[m] == null) stepsByM[m] = [];
+      stepsByM[m].push(s);
+    }
+
+    // Groupe les onsets MIDI par mesure (via barlines)
+    var onsetsByM = {};
+    for (var i = 0; i < onsets.length; i++) {
+      var o = onsets[i];
+      var mi = 0;
+      for (var j = 0; j < barlines.length - 1; j++) {
+        if (o >= barlines[j] - 1e-6 && o < barlines[j + 1] - 1e-6) { mi = j; break; }
+        mi = j;
+      }
+      if (onsetsByM[mi] == null) onsetsByM[mi] = [];
+      onsetsByM[mi].push(o);
+    }
+
+    // Pour chaque mesure OSMD, affecte les temps aux steps
+    var mKeys = Object.keys(stepsByM).map(Number).sort(function (a, b) { return a - b; });
+    for (var mk = 0; mk < mKeys.length; mk++) {
+      var m = mKeys[mk];
+      var steps = stepsByM[m];
+      // Assume 1:1 entre index mesure OSMD et index barres MIDI.
+      // (Une anacrouse en MusicXML peut decaler ; a raffiner si on en rencontre.)
+      var mStart = barlines[m] != null ? barlines[m] : 0;
+      var mEnd = barlines[m + 1] != null ? barlines[m + 1] : mStart + 1;
+      var notes = onsetsByM[m] || [];
+
+      if (steps.length === notes.length && notes.length > 0) {
+        // Match exact : 1 step = 1 onset
+        for (var k = 0; k < steps.length; k++) out[steps[k]] = notes[k];
+      } else if (notes.length > 0) {
+        // Mismatch : resample lineaire sur [notes..., mEnd] pour que
+        // le dernier step reste dans la mesure et le suivant
+        // (premier step de la mesure d'apres) s'anchore a mEnd.
+        var src = notes.concat([mEnd]);
+        var srcMax = src.length - 1;
+        var N = steps.length;
+        for (var k2 = 0; k2 < N; k2++) {
+          var pos = N > 0 ? (k2 / N) * srcMax : 0;
+          var lo = Math.floor(pos);
+          var hi = Math.min(lo + 1, srcMax);
+          var frac = pos - lo;
+          out[steps[k2]] = src[lo] * (1 - frac) + src[hi] * frac;
+        }
+      } else {
+        // Mesure sans note MIDI : distribue lineairement [mStart, mEnd)
+        var N2 = steps.length;
+        for (var k3 = 0; k3 < N2; k3++) {
+          var f = N2 > 1 ? k3 / N2 : 0;
+          out[steps[k3]] = mStart + f * (mEnd - mStart);
+        }
+      }
+    }
+    return out;
   }
 
   // Resample un tableau de temps (sec) a une longueur cible via
@@ -349,16 +444,25 @@
     interpolateCursorX(state, t);
 
     // Panneau de debug optionnel (ex. page de calibration).
-    // Affiche step courant, temps, temps attendu, derive.
+    // Affiche step courant, temps, temps attendu, derive, mesure.
     if (state.debugEl) {
       var expectedT = state.timemap[state.cursorStep] != null
         ? state.timemap[state.cursorStep] : state.timemap[state.timemap.length - 1];
       var prevT = state.cursorStep > 0 ? state.timemap[state.cursorStep - 1] : 0;
       var drift = t - prevT;
+      var meas = "";
+      if (state.barlines && state.stepMeasureIndex) {
+        var mIdx = state.stepMeasureIndex[state.cursorStep];
+        var mStart = state.barlines[mIdx];
+        var mEnd = state.barlines[mIdx + 1];
+        if (mStart != null && mEnd != null) {
+          meas = "  m=" + mIdx + "[" + mStart.toFixed(2) + "-" + mEnd.toFixed(2) + "s]";
+        }
+      }
       state.debugEl.textContent =
         "t=" + t.toFixed(3) + "s  step=" + state.cursorStep + "/" + state.timemap.length +
         "  prev_onset=" + prevT.toFixed(3) + "s  next_onset=" + expectedT.toFixed(3) + "s" +
-        "  drift=" + drift.toFixed(3) + "s  offset=" + offset.toFixed(2) + "s";
+        "  drift=" + drift.toFixed(3) + "s  offset=" + offset.toFixed(2) + "s" + meas;
     }
 
     requestAnimationFrame(function () { syncLoop(state); });
