@@ -25,6 +25,7 @@
   function initBlock(block) {
     var midiKey = block.dataset.midiKey;
     var scoresBase = block.dataset.scoresBase || "/assets/scores/";
+    var syncBase = block.dataset.syncBase || scoresBase.replace(/\/scores\/?$/, "/sync/");
     var osmdDiv = block.querySelector(".osmd-host");
     var playerEl = block.querySelector(".sync-player");
     var offsetInput = block.querySelector(".offset-input");
@@ -58,12 +59,24 @@
         if (!r.ok) throw new Error("timemap HTTP " + r.status);
         return r.json();
       }),
+      // Manifest optionnel produit a la capture ou en retrofit YouTube.
+      // Contient onsets_mp4/barlines_mp4 deja exprimes dans le referentiel
+      // temporel de la video -> plus besoin d'offset manuel.
+      fetch(syncBase + midiKey + ".sync.json").then(function (r) {
+        return r.ok ? r.json() : null;
+      }).catch(function () { return null; }),
     ])
       .then(function (vals) {
         var xml = vals[0];
         var map = vals[1];
-        state.timemap = map.onsets;
-        state.barlines = (map.barlines && map.barlines.length >= 2) ? map.barlines : null;
+        var sync = vals[2];
+        // Si le manifest sync est present, il remplace les donnees MIDI-space
+        // (onsets/barlines) par leurs equivalents MP4-space.
+        var useSync = !!(sync && sync.onsets_mp4 && sync.barlines_mp4);
+        state.syncManifest = useSync ? sync : null;
+        state.timemap = useSync ? sync.onsets_mp4 : map.onsets;
+        var barlinesSrc = useSync ? sync.barlines_mp4 : map.barlines;
+        state.barlines = (barlinesSrc && barlinesSrc.length >= 2) ? barlinesSrc : null;
 
         var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(osmdDiv, {
           autoResize: false,
@@ -115,9 +128,15 @@
               state.timemap = resampleTimemap(state.timemap, state.osmdSteps);
             }
           }
+          var src = useSync ? "sync=" + (sync.source || "manifest") : "sync=MIDI";
           statusEl.textContent =
             "Partition OK (MIDI=" + origLen + " / OSMD=" + state.osmdSteps +
-            " steps, " + mode + ").";
+            " steps, " + mode + ", " + src + ").";
+          // Avec un manifest sync, les temps sont deja en MP4-space donc
+          // l'offset par defaut devient 0 (sauf override explicite).
+          if (useSync && offsetInput && offsetInput.value === offsetInput.defaultValue) {
+            offsetInput.value = "0";
+          }
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
