@@ -53,6 +53,56 @@ def extract_onsets(midi_path: Path) -> list[float]:
     return sorted(onsets)
 
 
+def extract_barlines(midi_path: Path) -> list[float]:
+    """Return barline times in seconds: [0.0, start_of_m2, ..., end_of_last_m].
+
+    N measures => N+1 entries. Respects tempo and time-signature changes.
+    Barlines are *inferred* (MIDI has no explicit barline events): they fall
+    every ticks_per_measure ticks from the last time-signature change.
+    """
+    mid = mido.MidiFile(midi_path)
+    tpb = mid.ticks_per_beat
+    tempo = 500_000  # MIDI default = 120 BPM
+    num, denom = 4, 4
+    ticks_per_measure = tpb * num * 4 // denom
+
+    current_tick = 0
+    current_time = 0.0
+    last_barline_tick = 0
+    barlines = [0.0]
+    last_note_time = 0.0
+
+    for msg in mido.merge_tracks(mid.tracks):
+        delta = msg.time  # ticks between previous event and this one
+        while delta > 0:
+            to_bar = last_barline_tick + ticks_per_measure - current_tick
+            step = min(delta, to_bar)
+            current_time += mido.tick2second(step, tpb, tempo)
+            current_tick += step
+            if step == to_bar:
+                last_barline_tick = current_tick
+                barlines.append(round(current_time, 4))
+            delta -= step
+
+        if msg.type == "set_tempo":
+            tempo = msg.tempo
+        elif msg.type == "time_signature":
+            num, denom = msg.numerator, msg.denominator
+            ticks_per_measure = tpb * num * 4 // denom
+            last_barline_tick = current_tick  # mid-piece time-sig change resets barline
+        elif msg.type == "note_on" and msg.velocity > 0:
+            last_note_time = current_time
+
+    # Trim trailing barlines past the music (end-of-track padding etc.),
+    # keep exactly one barline >= last note to serve as the closing anchor.
+    trimmed = [b for b in barlines if b <= last_note_time + 1e-6]
+    for b in barlines:
+        if b > last_note_time + 1e-6:
+            trimmed.append(b)
+            break
+    return trimmed
+
+
 def render_musicxml(midi_path: Path, out_path: Path) -> None:
     if not MUSESCORE_CLI.exists():
         raise FileNotFoundError(f"MuseScore CLI not found: {MUSESCORE_CLI}")
@@ -163,10 +213,14 @@ def build_one(key: str) -> tuple[int, float]:
     render_musicxml(midi_path, xml_path)
     dropped, collapsed = consolidate_musicxml(xml_path)
     onsets = extract_onsets(midi_path)
-    map_path.write_text(json.dumps({"onsets": onsets}, separators=(",", ":")))
+    barlines = extract_barlines(midi_path)
+    map_path.write_text(json.dumps(
+        {"onsets": onsets, "barlines": barlines},
+        separators=(",", ":"),
+    ))
 
     duration = onsets[-1] if onsets else 0.0
-    return len(onsets), duration, dropped, collapsed
+    return len(onsets), duration, len(barlines) - 1, dropped, collapsed
 
 
 def main(argv: list[str]) -> int:
@@ -179,14 +233,14 @@ def main(argv: list[str]) -> int:
     SCORES_DIR.mkdir(parents=True, exist_ok=True)
     print(f"Output dir: {SCORES_DIR}")
     for key in keys:
-        n, dur, dropped, collapsed = build_one(key)
+        n, dur, nmeas, dropped, collapsed = build_one(key)
         extras = []
         if dropped:
             extras.append(f"{dropped} empty part(s) dropped")
         if collapsed:
             extras.append(f"{collapsed} stave(s) collapsed")
         extra_str = f"  [{', '.join(extras)}]" if extras else ""
-        print(f"  {key:30s}  {n:5d} onsets  {dur:7.2f}s{extra_str}")
+        print(f"  {key:30s}  {n:5d} onsets  {nmeas:4d} mes.  {dur:7.2f}s{extra_str}")
     return 0
 
 
