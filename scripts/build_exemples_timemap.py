@@ -1,4 +1,4 @@
-"""Recalcule les timemap des videos exemple1, exemple2, exemple3.
+"""Recalcule les timemap ET le MIDI pour exemple1/2/3.
 
 Les vidéos YouTube de ces trois exemples ont été capturées en envoyant
 des note_on/note_off inline depuis record_all_videos.py (pas a partir
@@ -21,12 +21,18 @@ from __future__ import annotations
 
 import json
 import random
+import subprocess
+import sys
 from pathlib import Path
+
+import mido
 
 ROOT = Path(__file__).resolve().parent.parent
 SCORES_DIR = ROOT / "assets" / "scores"
+MIDI_DIR = ROOT / "assets" / "midi"
 LEAD_IN = 0.3           # cf. record_all_videos.py ligne ~95
 CHORD_MERGE_TOL = 0.05  # onsets dans la meme fenetre = meme accord
+TICKS_PER_SEC = 480     # avec tempo=1_000_000 us/beat, 1 beat = 1 sec
 
 
 class Clock:
@@ -128,6 +134,65 @@ def write_timemap(key: str, onsets: list[float]) -> None:
     print(f"  {key:12s}  {len(onsets_rounded):3d} onsets  last={dur:6.2f}s")
 
 
+def build_example3_midi() -> Path:
+    """Genere exemple3.mid avec le timing reel de play_example3 (31 onsets).
+    Evite la desynchro avec OSMD : le MusicXML regenere aura aussi 31
+    positions au lieu de 32 avec l'ancien MIDI."""
+    random.seed(42)
+    events: list[tuple[float, str, int, int]] = []
+
+    def on(t: float, ch: int, note: int) -> None:
+        events.append((t, "note_on", ch, note))
+
+    def off(t: float, ch: int, note: int) -> None:
+        events.append((t, "note_off", ch, note))
+
+    def orn_block(t0: float, bass: int, alto: int, notes: list[tuple[int, float]]) -> float:
+        on(t0, 0, bass)
+        on(t0, 1, alto)
+        t = t0
+        for sop, d in notes:
+            j = random.uniform(0, 0.004)
+            t += j
+            on(t, 1, sop)
+            t += d * 0.9
+            off(t, 1, sop)
+            t += max(0.0, d * 0.1 - j)
+        off(t, 0, bass)
+        off(t, 1, alto)
+        return t
+
+    t = LEAD_IN
+    t = orn_block(t, 53, 69, [(72, 0.4), (74, 0.35), (72, 0.35), (70, 0.35),
+                              (69, 0.35), (70, 0.35), (72, 0.35), (72, 0.4)])
+    t = orn_block(t, 46, 70, [(74, 0.4), (75, 0.35), (74, 0.35), (72, 0.35),
+                              (70, 0.35), (72, 0.35), (74, 0.35), (74, 0.4)])
+    t = orn_block(t, 48, 67, [(76, 0.4), (77, 0.35), (76, 0.35), (74, 0.35),
+                              (72, 0.35), (74, 0.35), (76, 0.35), (76, 0.4)])
+    t = orn_block(t, 53, 69, [(77, 0.4), (79, 0.3), (81, 0.3), (79, 0.3),
+                              (77, 0.3), (76, 0.3), (77, 1.2)])
+
+    events.sort(key=lambda e: e[0])
+    mid = mido.MidiFile(ticks_per_beat=TICKS_PER_SEC)
+    tr = mido.MidiTrack()
+    mid.tracks.append(tr)
+    tr.append(mido.MetaMessage("set_tempo", tempo=1_000_000, time=0))
+    tr.append(mido.MetaMessage("time_signature", numerator=4, denominator=4, time=0))
+
+    last_t = 0.0
+    for (t_abs, mtype, chan, note) in events:
+        delta = max(0, int(round((t_abs - last_t) * TICKS_PER_SEC)))
+        vel = 80 if mtype == "note_on" else 0
+        tr.append(mido.Message(mtype, channel=chan, note=note, velocity=vel, time=delta))
+        last_t = t_abs
+    tr.append(mido.MetaMessage("end_of_track", time=0))
+
+    path = MIDI_DIR / "exemple3.mid"
+    mid.save(path)
+    print(f"  Wrote {path}")
+    return path
+
+
 def main() -> int:
     print(f"Re-generating timemaps to match actual video timings (lead-in {LEAD_IN}s).")
     print(f"Output dir: {SCORES_DIR}")
@@ -136,6 +201,20 @@ def main() -> int:
     ex2 = merge_onsets(simulate_example2())
     ex3 = merge_onsets(simulate_example3())
 
+    print("\nRegenerating exemple3.mid (31 onsets, matching simulation):")
+    build_example3_midi()
+
+    # Regenere le MusicXML d'exemple3 depuis le nouveau MIDI. build_scores.py
+    # va aussi ecrire sa propre version du timemap ; on ecrase ensuite avec
+    # notre version a 31 onsets (la sienne, plus fine au rounding, en donne
+    # ~34 ce qui remet du resampling).
+    print("\nRegenerating exemple3 MusicXML via build_scores.py:")
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "build_scores.py"), "exemple3"],
+        check=True,
+    )
+
+    print("\nWriting final timemaps (overwriting any intermediate versions):")
     write_timemap("exemple1", ex1)
     write_timemap("exemple2", ex2)
     write_timemap("exemple3", ex3)
