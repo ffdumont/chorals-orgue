@@ -21,7 +21,10 @@ from stops_control_sjdl import (Stops, CC_STOPS, CC_COUPLERS, STOPS_CHANNEL,
                                  PRESETS, PRESET_COUPLERS)
 
 OUT_DIR = r'D:/Projects/chorals-orgue/assets/video'
+SYNC_DIR = r'D:/Projects/chorals-orgue/assets/sync'
+MIDI_DIR = r'D:/Projects/chorals-orgue/assets/midi'
 os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(SYNC_DIR, exist_ok=True)
 
 # Alias pour les noms courts utilises dans ce script (compat historique)
 CC = {
@@ -77,7 +80,7 @@ def chord3_sap(s, a, bass, dur):
     time.sleep(dur * 0.08)
 
 def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=(),
-                   tail=1.0):
+                   tail=1.0, midi_path=None):
     if stops_off_after is None:
         stops_off_after = stops_on
 
@@ -99,6 +102,15 @@ def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=()
     time.sleep(tail)  # laisser mourir la reverbe avant de couper
     mp4 = os.path.join(OUT_DIR, f'{name}.mp4')
     rec.stop_and_save_mp4(mp4)
+
+    # Manifest de synchro : detecte le 1er onset audible et exprime les
+    # barres de mesure dans le referentiel temporel du MP4.
+    if midi_path is None:
+        midi_path = os.path.join(MIDI_DIR, f'{name}.mid')
+    if os.path.exists(midi_path):
+        rec.write_sync_manifest(name, midi_path, SYNC_DIR)
+    else:
+        print(f'  (sync.json skippe : {midi_path} introuvable)')
 
     # Retirer les jeux et accouplements
     for c in couplers_on:

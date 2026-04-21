@@ -13,6 +13,7 @@ Met a jour scripts/video_ids.yml :
 Les pages markdown sont ensuite regenerees par update_embeds.py.
 """
 import argparse
+import shutil
 import sys
 from pathlib import Path
 
@@ -25,6 +26,7 @@ from youtube_auth import get_credentials
 
 HERE = Path(__file__).parent
 MAPPING_FILE = HERE / 'video_ids.yml'
+SYNC_DIR = HERE.parent / 'assets' / 'sync'
 
 # Chunk size pour upload resumable (8 MB = bon compromis reseau/memoire)
 CHUNK_SIZE = 8 * 1024 * 1024
@@ -119,6 +121,17 @@ def main():
     mapping[args.key] = vid
     save_mapping(mapping)
     print(f'Mapping mis a jour : {MAPPING_FILE}')
+
+    # Si un sync.json a ete produit a la capture (cle par midi_key), on le
+    # copie sous la cle video_id — c'est cette cle-la que le JS charge en
+    # priorite (permet plusieurs videos pour un meme .mid).
+    capture_sync = SYNC_DIR / f'{args.key}.sync.json'
+    video_sync = SYNC_DIR / f'{vid}.sync.json'
+    if capture_sync.exists():
+        shutil.copy2(capture_sync, video_sync)
+        print(f'Sync copie : {capture_sync.name} -> {video_sync.name}')
+    else:
+        print(f'  (pas de sync.json trouve pour {args.key}, ignore)')
 
 
 if __name__ == '__main__':
