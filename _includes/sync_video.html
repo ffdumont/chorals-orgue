@@ -5,9 +5,12 @@ Parameters:
   video_id  — YouTube video ID (required)
   midi_key  — basename of the MusicXML / timemap files in assets/scores/ (required)
   title     — text for the iframe title attribute (optional, default "")
+  offset    — default offset in seconds to compensate for video lead-in
+              (prep, AG display, etc.). Default 0.
 
 Usage:
   {% include sync_video.html video_id="gKU9n1Uh6xI" midi_key="bwv572_gravement" title="BWV 572 SJdL" %}
+  {% include sync_video.html video_id="ott000oltCQ" midi_key="bwv572_gravement" title="Begard" offset="12.7" %}
 {%- endcomment -%}
 <div class="sync-block"
      data-video-id="{{ include.video_id }}"
@@ -26,7 +29,7 @@ Usage:
     </div>
   </div>
   <div class="sync-controls">
-    <label>Offset (s): <input type="number" class="offset-input" value="0" step="0.1" /></label>
+    <label>Offset (s): <input type="number" class="offset-input" value="{{ include.offset | default: 0 }}" step="0.1" /></label>
     <label><input type="checkbox" class="cursor-checkbox" checked /> Curseur visible</label>
     <span class="status">Chargement...</span>
   </div>
