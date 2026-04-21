@@ -4,7 +4,7 @@
   <identification>
     <encoding>
       <software>MuseScore Studio 4.6.5</software>
-      <encoding-date>2026-04-20</encoding-date>
+      <encoding-date>2026-04-21</encoding-date>
       <supports element="accidental" type="yes" />
       <supports element="beam" type="yes" />
       <supports element="print" attribute="new-page" type="yes" value="yes" />
@@ -12,7 +12,7 @@
       <supports element="stem" type="yes" />
       </encoding>
     <miscellaneous>
-      <miscellaneous-field name="creationDate">2026-04-20</miscellaneous-field>
+      <miscellaneous-field name="creationDate">2026-04-21</miscellaneous-field>
       <miscellaneous-field name="platform">Microsoft Windows</miscellaneous-field>
       </miscellaneous>
     </identification>
@@ -149,11 +149,11 @@
         <direction-type>
           <metronome parentheses="no" default-x="-37.68" relative-y="20">
             <beat-unit>quarter</beat-unit>
-            <per-minute>40</per-minute>
+            <per-minute>79</per-minute>
             </metronome>
           </direction-type>
         <staff>1</staff>
-        <sound tempo="40" />
+        <sound tempo="79" />
         </direction>
       <note default-x="97.63" default-y="0" dynamics="88.89">
         <pitch>
