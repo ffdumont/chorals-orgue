@@ -26,19 +26,25 @@
     var midiKey = block.dataset.midiKey;
     var scoresBase = block.dataset.scoresBase || "/assets/scores/";
     var osmdDiv = block.querySelector(".osmd-host");
-    var playerIframe = block.querySelector(".sync-player");
+    var playerEl = block.querySelector(".sync-player");
     var offsetInput = block.querySelector(".offset-input");
     var cursorCheckbox = block.querySelector(".cursor-checkbox");
     var statusEl = block.querySelector(".status");
+    var debugEl = block.querySelector(".sync-debug");
+    var isAudio = playerEl && playerEl.tagName === "AUDIO";
 
     var state = {
       block: block,
       osmd: null,
       timemap: null,
+      timemapOrig: null,  // MIDI onsets avant resampling
+      osmdSteps: 0,
       cursorStep: 0,
-      ytPlayer: null,
+      player: null,    // objet avec .getCurrentTime()
+      isAudio: isAudio,
       offsetInput: offsetInput,
       statusEl: statusEl,
+      debugEl: debugEl,
       running: false,
     };
     block._syncState = state;
@@ -90,13 +96,14 @@
           // timemap dessus. Si MuseScore a plus ou moins de "beat
           // positions" dans le MusicXML que nos onsets MIDI, la sync
           // derive : on resample notre timemap sur la bonne longueur.
-          var osmdSteps = countCursorSteps(osmd);
+          state.timemapOrig = state.timemap;
+          state.osmdSteps = countCursorSteps(osmd);
           var origLen = state.timemap.length;
-          if (osmdSteps > 0 && osmdSteps !== origLen) {
-            state.timemap = resampleTimemap(state.timemap, osmdSteps);
+          if (state.osmdSteps > 0 && state.osmdSteps !== origLen) {
+            state.timemap = resampleTimemap(state.timemap, state.osmdSteps);
           }
           statusEl.textContent =
-            "Partition OK (MIDI=" + origLen + " / OSMD=" + osmdSteps + " steps).";
+            "Partition OK (MIDI=" + origLen + " / OSMD=" + state.osmdSteps + " steps).";
 
           if (cursorCheckbox) {
             cursorCheckbox.addEventListener("change", function () {
@@ -105,7 +112,10 @@
             });
           }
 
-          if (ytApiReady) initYtPlayer(block);
+          // Audio HTML5 : pas besoin de YouTube API, branche direct.
+          // Video YouTube : attend que l'API soit chargee.
+          if (state.isAudio) initAudioPlayer(block);
+          else if (ytApiReady) initYtPlayer(block);
           else pendingForYt.push(block);
         });
       })
@@ -121,7 +131,7 @@
     if (!state) return;
     var iframe = block.querySelector(".sync-player");
     if (!iframe.id) iframe.id = "sync-player-" + Math.random().toString(36).slice(2, 10);
-    state.ytPlayer = new YT.Player(iframe.id, {
+    state.player = new YT.Player(iframe.id, {
       events: {
         onReady: function () {
           state.statusEl.textContent += " | Video prete.";
@@ -134,6 +144,22 @@
         },
       },
     });
+  }
+
+  function initAudioPlayer(block) {
+    var state = block._syncState;
+    if (!state) return;
+    var audio = block.querySelector(".sync-player");
+    // Wrappe l'element HTMLAudioElement dans un objet avec la meme API
+    // (getCurrentTime) que le YT.Player, pour partager syncLoop.
+    state.player = { getCurrentTime: function () { return audio.currentTime; } };
+    audio.addEventListener("play", function () {
+      if (!state.running) {
+        state.running = true;
+        requestAnimationFrame(function () { syncLoop(state); });
+      }
+    });
+    state.statusEl.textContent += " | Audio pret.";
   }
 
   // Parcourt le curseur OSMD d'un bout a l'autre pour compter les
@@ -196,12 +222,23 @@
   // largeur se deduit du ratio 16:9.
   function fitHeights(block, osmdDiv) {
     var scoreWrap = block.querySelector(".score-wrap");
-    var videoWrap = block.querySelector(".video-wrap");
-    var layout = block.querySelector(".sync-layout");
-    if (!scoreWrap || !videoWrap || !layout) return;
+    if (!scoreWrap) return;
 
-    // Mobile (flex-direction: column via media query) : ne touche pas a
-    // la largeur, fixe une hauteur plus grande pour la partition.
+    var svg = osmdDiv.querySelector("svg");
+    var systemH = svg ? svg.getBoundingClientRect().height : 260;
+    var target = Math.max(180, Math.min(systemH + 8, window.innerHeight * 0.55, 460));
+
+    var layout = block.querySelector(".sync-layout");
+    var videoWrap = block.querySelector(".video-wrap");
+
+    // Pas de layout flex (ex. page calibration en audio simple) :
+    // juste la hauteur partition, rien a aligner.
+    if (!layout || !videoWrap) {
+      scoreWrap.style.height = target + "px";
+      return;
+    }
+
+    // Mobile : flex column, partition pleine largeur sous la video
     if (getComputedStyle(layout).flexDirection === "column") {
       scoreWrap.style.height = "48vh";
       videoWrap.style.height = "";
@@ -209,16 +246,10 @@
       return;
     }
 
-    var svg = osmdDiv.querySelector("svg");
-    var systemH = svg ? svg.getBoundingClientRect().height : 260;
-    // Bornes : ni trop petit (video devient illisible), ni plus grand
-    // que ~55vh pour garder la suite de la page visible.
-    var target = Math.max(180, Math.min(systemH + 8, window.innerHeight * 0.55, 460));
-    var videoW = target * 16 / 9;
-
+    // Desktop cote-a-cote : video calee sur la hauteur partition, ratio 16:9
     scoreWrap.style.height = target + "px";
     videoWrap.style.height = target + "px";
-    videoWrap.style.width = videoW + "px";
+    videoWrap.style.width = (target * 16 / 9) + "px";
   }
 
   function resetCursorTo(state, t) {
@@ -231,12 +262,12 @@
   }
 
   function syncLoop(state) {
-    if (!state.ytPlayer || typeof state.ytPlayer.getCurrentTime !== "function") {
+    if (!state.player || typeof state.player.getCurrentTime !== "function") {
       requestAnimationFrame(function () { syncLoop(state); });
       return;
     }
     var offset = parseFloat(state.offsetInput.value) || 0;
-    var t = state.ytPlayer.getCurrentTime() - offset;
+    var t = state.player.getCurrentTime() - offset;
 
     // Scrub backward -> rewind cursor from scratch
     if (state.cursorStep > 0 && state.timemap[state.cursorStep - 1] > t + 0.25) {
@@ -247,6 +278,20 @@
         state.cursorStep++;
       }
     }
+
+    // Panneau de debug optionnel (ex. page de calibration).
+    // Affiche step courant, temps, temps attendu, derive.
+    if (state.debugEl) {
+      var expectedT = state.timemap[state.cursorStep] != null
+        ? state.timemap[state.cursorStep] : state.timemap[state.timemap.length - 1];
+      var prevT = state.cursorStep > 0 ? state.timemap[state.cursorStep - 1] : 0;
+      var drift = t - prevT;
+      state.debugEl.textContent =
+        "t=" + t.toFixed(3) + "s  step=" + state.cursorStep + "/" + state.timemap.length +
+        "  prev_onset=" + prevT.toFixed(3) + "s  next_onset=" + expectedT.toFixed(3) + "s" +
+        "  drift=" + drift.toFixed(3) + "s  offset=" + offset.toFixed(2) + "s";
+    }
+
     requestAnimationFrame(function () { syncLoop(state); });
   }
 
