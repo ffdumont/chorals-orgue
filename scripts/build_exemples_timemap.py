@@ -133,10 +133,11 @@ def write_timemap(key: str, onsets: list[float]) -> None:
 
 
 def scale_old_midi_for_example3() -> tuple[Path, list[float]]:
-    """Scale l'ancien exemple3.mid (6s/accord, 32 onsets propres) au tempo
-    du code actuel (2.9s/accord). Retourne le path du nouveau MIDI et
-    la liste des onsets scales (pour le timemap)."""
-    # Recupere l'ancien MIDI depuis git (commit 0f1862f, avant qu'on l'ecrase)
+    """Reprend l'ancien exemple3.mid (6s/accord, 32 onsets, MusicXML
+    propre en rondes+croches) et CHANGE LE TEMPO pour que ca joue 2.07x
+    plus vite (2.9s/accord). Les durees de notes en ticks restent les
+    memes : la notation reste la meme (rondes/croches), seule la vitesse
+    change. Retourne le path du nouveau MIDI et les onsets scales."""
     old_path = MIDI_DIR / "_exemple3_orig.mid"
     if not old_path.exists():
         subprocess.run(
@@ -146,22 +147,28 @@ def scale_old_midi_for_example3() -> tuple[Path, list[float]]:
         )
 
     old = mido.MidiFile(str(old_path))
-    # Accords de l'ancien MIDI : [0, 6, 12, 18] sec. Accord courant : 2.9s.
-    # On scale par 2.9 / 6.
-    scale = 2.9 / 6.0
+    scale = 2.9 / 6.0  # nouveau_tempo = ancien * scale (plus petit => plus rapide)
 
     new = mido.MidiFile(ticks_per_beat=old.ticks_per_beat)
     for track in old.tracks:
         new_track = mido.MidiTrack()
         for msg in track:
-            new_track.append(msg.copy(time=max(0, round(msg.time * scale))))
+            if msg.type == "set_tempo":
+                # On scale uniquement le tempo (us/beat). Temps en ticks
+                # inchanges -> MuseScore voit les memes durees de notes.
+                new_track.append(msg.copy(tempo=round(msg.tempo * scale)))
+            else:
+                new_track.append(msg.copy())
         new.tracks.append(new_track)
 
     new_path = MIDI_DIR / "exemple3.mid"
     new.save(str(new_path))
-    print(f"  Scaled old exemple3.mid by {scale:.3f} -> {new_path}")
+    old_bpm = 60_000_000 / 1_500_000
+    new_bpm = old_bpm / scale
+    print(f"  Tempo scaled {old_bpm:.0f} -> {new_bpm:.0f} BPM -> {new_path}")
 
-    # Extrait les onsets du nouveau MIDI, ajoute lead-in, merge accords
+    # Extrait les onsets du nouveau MIDI (avec le tempo modifie), ajoute
+    # lead-in, merge accords proches
     t = 0.0
     onsets: set[float] = set()
     for msg in new:
