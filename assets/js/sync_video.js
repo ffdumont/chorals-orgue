@@ -92,12 +92,15 @@
           forceCursorImgSize(osmdDiv);
           fitHeights(block, osmdDiv);
 
-          // Compte les steps reels du curseur OSMD pour aligner notre
-          // timemap dessus. Si MuseScore a plus ou moins de "beat
-          // positions" dans le MusicXML que nos onsets MIDI, la sync
-          // derive : on resample notre timemap sur la bonne longueur.
+          // Parcourt le curseur OSMD pour (1) compter les steps, (2)
+          // enregistrer la position X de chaque step. Cette table permet
+          // d'interpoler la position horizontale du curseur entre deux
+          // onsets pour qu'il glisse continument au lieu de rester
+          // fige sur une note longue (ex: ronde de 6s).
           state.timemapOrig = state.timemap;
-          state.osmdSteps = countCursorSteps(osmd);
+          var walk = walkCursor(osmd, osmdDiv);
+          state.osmdSteps = walk.count;
+          state.cursorXs = walk.positions;
           var origLen = state.timemap.length;
           if (state.osmdSteps > 0 && state.osmdSteps !== origLen) {
             state.timemap = resampleTimemap(state.timemap, state.osmdSteps);
@@ -163,22 +166,34 @@
   }
 
   // Parcourt le curseur OSMD d'un bout a l'autre pour compter les
-  // positions ("steps"). Restaure le curseur au debut a la fin.
-  function countCursorSteps(osmd) {
+  // positions ("steps") ET pour enregistrer la position X de chaque
+  // step (via offsetLeft de l'<img> curseur). Restaure le curseur au
+  // debut a la fin.
+  function walkCursor(osmd, osmdDiv) {
+    var positions = [];
+    var count = 0;
     try {
       osmd.cursor.reset();
-      var n = 0;
+      forceCursorImgSize(osmdDiv);
+      var img = osmdDiv.querySelector("img");
+      if (img) positions.push(img.offsetLeft);
       var guard = 0;
       while (!osmd.cursor.iterator.EndReached && guard < 100000) {
         osmd.cursor.next();
-        n++;
+        count++;
+        img = osmdDiv.querySelector("img");
+        if (img) positions.push(img.offsetLeft);
         guard++;
       }
       osmd.cursor.reset();
-      return n;
+      // count = nombre d'avances effectuees = nombre de transitions
+      // entre positions. On a enregistre count+1 positions (depart + apres
+      // chaque next). On retourne count+1 positions et count++ pour que
+      // osmdSteps = nombre de positions visitables.
+      return { count: count + 1, positions: positions };
     } catch (e) {
-      console.error("countCursorSteps failed:", e);
-      return 0;
+      console.error("walkCursor failed:", e);
+      return { count: 0, positions: [] };
     }
   }
 
@@ -250,6 +265,36 @@
     scoreWrap.style.height = target + "px";
     videoWrap.style.height = target + "px";
     videoWrap.style.width = (target * 16 / 9) + "px";
+  }
+
+  // Deplace le curseur OSMD horizontalement d'apres le temps ecoule
+  // dans l'intervalle [timemap[step], timemap[step+1]]. Utilise les
+  // positions pre-calculees dans walkCursor.
+  function interpolateCursorX(state, t) {
+    if (!state.cursorXs || state.cursorXs.length === 0) return;
+    var step = state.cursorStep;
+    var xs = state.cursorXs;
+    if (step >= xs.length) return;
+
+    var curT = state.timemap[step];
+    var nextT = step + 1 < state.timemap.length ? state.timemap[step + 1] : curT;
+    var curX = xs[step];
+    var nextX = step + 1 < xs.length ? xs[step + 1] : curX;
+
+    var frac = 0;
+    if (nextT > curT) {
+      frac = Math.max(0, Math.min(1, (t - curT) / (nextT - curT)));
+    }
+    var targetX = curX + (nextX - curX) * frac;
+
+    var osmdDiv = state.osmdDiv || state.block.querySelector(".osmd-host");
+    if (!osmdDiv) return;
+    var img = osmdDiv.querySelector("img");
+    if (!img) return;
+    // Laisse style.left tel que pose par OSMD (curX) et applique le
+    // delta via transform — evite les conflits avec OSMD qui repose
+    // style.left a chaque cursor.next().
+    img.style.transform = "translateX(" + (targetX - curX) + "px)";
   }
 
   function resetCursorTo(state, t) {
