@@ -171,7 +171,6 @@
   // debut a la fin.
   function walkCursor(osmd, osmdDiv) {
     var positions = [];
-    var count = 0;
     try {
       osmd.cursor.reset();
       forceCursorImgSize(osmdDiv);
@@ -180,17 +179,16 @@
       var guard = 0;
       while (!osmd.cursor.iterator.EndReached && guard < 100000) {
         osmd.cursor.next();
-        count++;
+        // Si on vient de depasser la derniere note, ne pas compter cette
+        // position "past end" dans la liste : elle gonfle faussement
+        // osmdSteps et fait resampler le timemap trop dense.
+        if (osmd.cursor.iterator.EndReached) break;
         img = osmdDiv.querySelector("img");
         if (img) positions.push(img.offsetLeft);
         guard++;
       }
       osmd.cursor.reset();
-      // count = nombre d'avances effectuees = nombre de transitions
-      // entre positions. On a enregistre count+1 positions (depart + apres
-      // chaque next). On retourne count+1 positions et count++ pour que
-      // osmdSteps = nombre de positions visitables.
-      return { count: count + 1, positions: positions };
+      return { count: positions.length, positions: positions };
     } catch (e) {
       console.error("walkCursor failed:", e);
       return { count: 0, positions: [] };
