@@ -50,6 +50,18 @@
     };
     block._syncState = state;
 
+    function tryFetchJson(url) {
+      if (!url) return Promise.resolve(null);
+      return fetch(url).then(function (r) {
+        return r.ok ? r.json() : null;
+      }).catch(function () { return null; });
+    }
+
+    // Sync manifest : priorite au fichier cle par video_id (permet plusieurs
+    // captures pour un meme .mid, ex. BWV 572 SJdL + Begard). Fallback sur
+    // la cle midi_key (pratique immediatement apres capture, avant upload).
+    var videoId = block.dataset.videoId || null;
+
     Promise.all([
       fetch(scoresBase + midiKey + ".musicxml").then(function (r) {
         if (!r.ok) throw new Error("MusicXML HTTP " + r.status);
@@ -59,17 +71,13 @@
         if (!r.ok) throw new Error("timemap HTTP " + r.status);
         return r.json();
       }),
-      // Manifest optionnel produit a la capture ou en retrofit YouTube.
-      // Contient onsets_mp4/barlines_mp4 deja exprimes dans le referentiel
-      // temporel de la video -> plus besoin d'offset manuel.
-      fetch(syncBase + midiKey + ".sync.json").then(function (r) {
-        return r.ok ? r.json() : null;
-      }).catch(function () { return null; }),
+      tryFetchJson(videoId ? syncBase + videoId + ".sync.json" : null),
+      tryFetchJson(syncBase + midiKey + ".sync.json"),
     ])
       .then(function (vals) {
         var xml = vals[0];
         var map = vals[1];
-        var sync = vals[2];
+        var sync = vals[2] || vals[3];  // priorite video_id
         // Si le manifest sync est present, il remplace les donnees MIDI-space
         // (onsets/barlines) par leurs equivalents MP4-space.
         var useSync = !!(sync && sync.onsets_mp4 && sync.barlines_mp4);
