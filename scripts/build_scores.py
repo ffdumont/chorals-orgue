@@ -93,14 +93,19 @@ def extract_barlines(midi_path: Path) -> list[float]:
         elif msg.type == "note_on" and msg.velocity > 0:
             last_note_time = current_time
 
-    # Trim trailing barlines past the music (end-of-track padding etc.),
-    # keep exactly one barline >= last note to serve as the closing anchor.
-    trimmed = [b for b in barlines if b <= last_note_time + 1e-6]
-    for b in barlines:
-        if b > last_note_time + 1e-6:
-            trimmed.append(b)
-            break
-    return trimmed
+    # Closing anchor: si la MIDI se termine avant la barre suivante, on
+    # ajoute des barres synthetiques (au tempo courant) jusqu'a couvrir la
+    # derniere note. Garantit que la derniere mesure a son mEnd correct.
+    guard = 0
+    while barlines[-1] + 1e-6 < last_note_time and guard < 1000:
+        step = (last_barline_tick + ticks_per_measure) - current_tick
+        current_time += mido.tick2second(step, tpb, tempo)
+        current_tick += step
+        last_barline_tick = current_tick
+        barlines.append(round(current_time, 4))
+        guard += 1
+
+    return barlines
 
 
 def render_musicxml(midi_path: Path, out_path: Path) -> None:
