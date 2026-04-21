@@ -162,7 +162,12 @@ def build_example3_midi() -> Path:
         off(t, 1, alto)
         return t
 
-    t = LEAD_IN
+    # IMPORTANT : le MIDI demarre a t=0 (pas de lead-in). MuseScore
+    # generait une mesure de silence initiale quand on mettait LEAD_IN
+    # comme delai avant la 1ere note, ajoutant une position "rest" au
+    # curseur OSMD et cassant la sync (MIDI=31 / OSMD=32). Le lead-in
+    # est ajoute seulement au timemap.
+    t = 0.0
     t = orn_block(t, 53, 69, [(72, 0.4), (74, 0.35), (72, 0.35), (70, 0.35),
                               (69, 0.35), (70, 0.35), (72, 0.35), (72, 0.4)])
     t = orn_block(t, 46, 70, [(74, 0.4), (75, 0.35), (74, 0.35), (72, 0.35),
