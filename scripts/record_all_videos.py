@@ -58,13 +58,20 @@ def non(ch, n, v=80):
 def nof(ch, n):
     out.send(mido.Message('note_off', channel=ch, note=n, velocity=0))
 
-def chord4_go(s, a, t, b, dur):
-    for n in [b, t, a, s]:
-        non(1, n)
-        time.sleep(0.01)
+def chord4_satb(s, a, t, b, dur):
+    """SATB : soprano/alto/tenor au Grand Orgue, basse au pedalier."""
+    non(0, b)
+    time.sleep(0.008)
+    non(1, t)
+    time.sleep(0.008)
+    non(1, a)
+    time.sleep(0.008)
+    non(1, s)
     time.sleep(dur * 0.92)
-    for n in [b, t, a, s]:
-        nof(1, n)
+    nof(0, b)
+    nof(1, t)
+    nof(1, a)
+    nof(1, s)
     time.sleep(dur * 0.08)
 
 def chord3_sap(s, a, bass, dur):
@@ -122,10 +129,10 @@ def record_example(name, play_fn, stops_on, stops_off_after=None, couplers_on=()
 # ============ Exemples (copie de record_all.py) ============
 
 def play_example1():
-    chord4_go(77, 72, 69, 53, 3)
-    chord4_go(77, 74, 70, 46, 3)
-    chord4_go(76, 72, 67, 48, 3)
-    chord4_go(77, 72, 69, 53, 4)
+    chord4_satb(77, 72, 69, 53, 3)
+    chord4_satb(77, 74, 70, 46, 3)
+    chord4_satb(76, 72, 67, 48, 3)
+    chord4_satb(77, 72, 69, 53, 4)
 
 def play_example2():
     chord3_sap(72, 69, 53, 3)
