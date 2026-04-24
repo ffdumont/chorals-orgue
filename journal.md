@@ -9,6 +9,15 @@ permalink: /journal/
 
 Cette page recense les ajouts et modifications notables apportés au wiki : nouvelles pièces, refontes de pages, ajustements techniques. Les entrées sont listées de la plus récente à la plus ancienne.
 
+## 2026-04-24
+
+### Page [BWV 939 — Petit Prélude en Do majeur](/chorals-orgue/pieces/bwv939/)
+
+- Ajout d'un court prélude pédagogique issu des *Cinq Petits Préludes* BWV 939-943 : arpèges brisés main droite sur rondes tenues main gauche, 15 mesures en Do majeur, pièce pour clavier (pas de pédalier).
+- Version jouée en **tempo d'étude ♩ = 70** (plus lent que l'*Allegretto* ♩ = 100 de l'arrangement Ben Choupak récupéré sur Musescore), pour faire entendre chaque croche et la progression harmonique.
+- Registration douce : **Flûte harmonique 8' + Bourdon 8'** au Grand Orgue de Saint-Jean-de-Luz (Chœur).
+- Côté pipeline : ajout d'une fonction `play_bwv939()` dans [scripts/record_all_videos.py](https://github.com/ffdumont/chorals-orgue/blob/main/scripts/record_all_videos.py) ; MusicXML source récupéré depuis l'arrangement Choupak (MusicTake) et converti en MIDI via MuseScore 4 CLI ; canaux MIDI remappés sur le Grand Orgue (canal 2) puisque la pièce n'a pas de partie de pédalier.
+
 ## 2026-04-20
 
 ### Page [BWV 572 — Pièce d'orgue (Gravement)](/chorals-orgue/pieces/bwv572/) — version Bégard

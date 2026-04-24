@@ -189,6 +189,12 @@ def play_bwv572_gravement():
         if not msg.is_meta:
             out.send(msg)
 
+def play_bwv939():
+    mid = mido.MidiFile(r'D:/Projects/chorals-orgue/assets/midi/bwv939.mid')
+    for msg in mid.play():
+        if not msg.is_meta:
+            out.send(msg)
+
 # ============ Run ============
 
 if __name__ == '__main__':
@@ -229,6 +235,9 @@ if __name__ == '__main__':
         # mourir la reverbe des samples (5s) avant de couper la capture.
         ('bwv572_gravement', play_bwv572_gravement,
          PRESETS['grand_plein_jeu'], PRESET_COUPLERS['grand_plein_jeu'], 5.0),
+        # BWV 939 : petit prelude didactique pour clavier, pas de pedale.
+        # Registration 'doux' = Flute harmonique 8 + Bourdon 8.
+        ('bwv939', play_bwv939, ['GO_flute8', 'GO_bourdon8'], (), 1.5),
     ]
 
     if only:
