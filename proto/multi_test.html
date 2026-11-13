@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Test multi-instance sync_video</title>
+
+<!-- Simulates what {% include sync_head.html %} produces, with paths
+     adjusted to the repo root served by python -m http.server -->
+<link rel="stylesheet" href="/assets/css/sync_video.css">
+<script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.7/build/opensheetmusicdisplay.min.js"></script>
+<script defer src="/assets/js/sync_video.js"></script>
+
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 1200px; margin: 2em auto; padding: 0 1em; color: #222; }
+  h1 { font-size: 1.3em; }
+  h2 { margin-top: 2em; font-size: 1.1em; }
+  .note { color: #0a6; }
+</style>
+</head>
+<body>
+
+<h1>Test multi-instance sync_video</h1>
+<p class="note">Cette page simule ce que Jekyll produira sur les pages pieces/bwv572.md et pieces/bwv639.md : plusieurs blocs sync_video sur une meme page, chacun avec son propre player YouTube et sa propre partition synchronisee.</p>
+
+<h2>Bloc 1 — BWV 572 Gravement (Saint-Jean-de-Luz)</h2>
+
+<div class="sync-block"
+     data-video-id="gKU9n1Uh6xI"
+     data-midi-key="bwv572_gravement"
+     data-scores-base="/assets/scores/">
+  <div class="video-wrap">
+    <iframe class="sync-player"
+            src="https://www.youtube.com/embed/gKU9n1Uh6xI?enablejsapi=1"
+            title="BWV 572 Gravement SJdL"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+  </div>
+  <div class="score-wrap">
+    <div class="osmd-host"></div>
+  </div>
+  <div class="sync-controls">
+    <label>Offset (s): <input type="number" class="offset-input" value="0" step="0.1" /></label>
+    <label><input type="checkbox" class="cursor-checkbox" checked /> Curseur visible</label>
+    <span class="status">Chargement...</span>
+  </div>
+</div>
+
+<h2>Bloc 2 — Exemple 4 (basse pizzicato)</h2>
+
+<div class="sync-block"
+     data-video-id="SEMtw5pyQBo"
+     data-midi-key="exemple4"
+     data-scores-base="/assets/scores/">
+  <div class="video-wrap">
+    <iframe class="sync-player"
+            src="https://www.youtube.com/embed/SEMtw5pyQBo?enablejsapi=1"
+            title="Exemple 4 basse pizzicato"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+  </div>
+  <div class="score-wrap">
+    <div class="osmd-host"></div>
+  </div>
+  <div class="sync-controls">
+    <label>Offset (s): <input type="number" class="offset-input" value="0" step="0.1" /></label>
+    <label><input type="checkbox" class="cursor-checkbox" checked /> Curseur visible</label>
+    <span class="status">Chargement...</span>
+  </div>
+</div>
+
+</body>
+</html>
